@@ -1,0 +1,36 @@
+{% extends "admin/base_site.html" %}
+{% load suit_tags %}
+{% block content %}
+<div id="content-main" class="inner-center-column">
+{% if is_popup %}
+    <input type="hidden" name="_popup" value="1"/>
+{% endif %}
+   <div class="inner-center-column">
+       <div class="control-group">
+           <form action={{ form_url }} method="post" class="form-horizontal" enctype="multipart/form-data">
+                {% csrf_token %}
+                {% for field in form %}
+                    {% if not field.is_hidden %}
+                        <div class="field-box">
+                            <div class="control-label">
+                            {{ field.label_tag }}
+                            </div>
+                            <div class="controls">
+                                {{ field }}
+                            </div>
+                        </div>
+                        {% else %}
+                        {{ field.as_hidden }}
+                    {% endif %}
+                {% endfor %}
+                <div class="controls">
+                    <button type="submit" class="btn btn-primary">
+                        Submit
+                    </button>
+               </div>
+            </form>
+       </div>
+   </div>
+</div>
+{% endblock %}
+

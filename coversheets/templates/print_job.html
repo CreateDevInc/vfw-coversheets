@@ -1,0 +1,239 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/html">
+    
+    <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+        {% load bootstrap3 %}
+        {% bootstrap_css %}
+        <script src="//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.js"></script>
+        {% bootstrap_javascript %}
+        <script type="text/javascript" src="http://cdnjs.cloudflare.com/ajax/libs/jquery/2.0.3/jquery.min.js"></script>
+        <script type="text/javascript" src="http://netdna.bootstrapcdn.com/bootstrap/3.3.2/js/bootstrap.min.js"></script>
+        <link href="http://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.3.0/css/font-awesome.min.css"
+        rel="stylesheet" type="text/css">
+        <link href="http://pingendo.github.io/pingendo-bootstrap/themes/default/bootstrap.css"
+        rel="stylesheet" type="text/css">
+    </head>
+    
+    <body>
+        <div class="container">
+            <h1>
+                <span> Valley Fire &amp; Water Restorations Inc</span>
+                <span class="pull-right"><img src="/static/img/v_only_100.png"></span>
+                <br>
+            </h1>
+            <span style="font-size: 16px">
+            75 W Baseline Rd, Suite 31<br>
+            Gilbert, AZ 85233<br>
+            www.valleyfireandwater.com<br>
+            </span>
+        </div>
+        <div class="container">
+            <div class="row text-primary" style="font-size: 26px; font-weight: 700">
+                <div class="col-sm-4">
+                    Estimator:
+                </div>
+                <div class="col-sm-4">
+                    Job Number:
+                </div>
+                <div class="col-sm-4">
+                    Type:
+                </div>
+            </div>
+            <div class="row" style="font-size: 26px; border-bottom: 3px solid #DDD;">
+                <div class="col-sm-4">
+                    {{job.estimator.first_name}}
+                </div>
+                <div class="col-sm-4">
+                    {{ job.job_number }}
+                </div>
+                <div class="col-sm-4">
+                    {{ job.loss_type}}
+                </div>
+            </div>
+            <div class="row" style="border-bottom: 1px solid #EEE;" >
+                <div class="col-sm-4">
+                    <h4><strong>Entry Date:</strong> {{ job.entry_date }}</h4>
+                </div>
+                <div class="col-sm-4">
+                    <h4><strong>Called in By:</strong> {{ job.called_in_by }}</h4>
+                </div>
+                <div class="col-sm-4">
+                    <h4><strong>Referred By:</strong> {{ job.referred_by }}</h4>
+                </div>
+            </div>
+            <div class="row" style="border-bottom: 1px solid #EEE;">
+                <div class="col-sm-2">
+                    <h4><strong>Insured:</strong></h4>
+                    <h4><strong>Phone:</strong></h4>
+                    <h4><strong>Mobile:</strong></h4>
+                    <h4><strong>Email:</strong></h4>
+                </div>
+                <div class="col-sm-4">
+                    <h4>{{ job.customer }}</h4><br>
+                    <h4>{{ job.customer_phone }}</h4><br>
+                    <h4>{{ job.customer_mobile }}</h4><br>
+                    <h4>{{ job.customer_email }}</h4>
+                </div>
+                <div class="col-sm-2">
+                    <h4><strong>Contact:</strong></h4>
+                    <h4><strong>Phone:</strong></h4>
+                    <h4><strong>Mobile:</strong></h4>
+                    <h4><strong>Email:</strong></h4>
+                </div>
+                <div class="col-sm-4">
+                    <h4>{{ job.contact }}</h4><br>
+                    <h4>{{ job.primary_phone }}</h4><br>
+                    <h4>{{ job.mobile_phone }}</h4>
+                    <h4>{{ job.contact_email }}</h4>
+                </div>
+            </div>
+            <div class="row" style="border-bottom: 1px solid #EEE;">
+                <div class="col-sm-2" style="font-size: 18px; font-weight: 700;">
+                    Loss Address:
+                </div>
+                <div class="col-sm-4" style="font-size: 16px;">
+                    {{ job.loss_address }}<br>
+                    {{ job.loss_city.name }}, {{ job.loss_city.region.geoname_code }}. {{ job.loss_zip }}<br>
+                    {{ job.directions }}
+                </div>
+                <div class="col-sm-2" style="font-size: 18px; font-weight: 700;">
+                    Mailing Address:
+                </div>
+                <div class="col-sm-4" style="font-size: 16px;">
+                        {{ job.address }}<br>
+                        {{ job.city.name }}, {{ job.city.region.geoname_code }}. {{ job.zip }}<br>
+                </div>
+            </div>
+            <div class="row" style="border-bottom: 1px solid #EEE;">
+                <h2> Insurance Information </h2>
+                <span class="col-sm-6" style="font-size: 18px;">
+                    <table class="table">
+                        <tr>
+                            <td>
+                                Company:
+                            </td>
+                            <td>
+                            {{ job.insurance_company }}
+                            </tr>
+                        <tr>
+                            <td>
+                                Adjuster:
+                            </td>
+                            <td>
+                                {{ job.adjuster }}
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>
+                                Phone:
+                            </td>
+                            <td>
+                                {{ job.adjuster.phone }}
+                            </td>
+
+                        </tr>
+                        <tr>
+                            <td>
+                                Mobile:
+                            </td>
+                            <td>
+                                {{ job.adjuster.mobile }}
+                            </td>
+                        </tr>
+                    </table>
+                </span>
+                <span class="col-sm-6" style="font-size: 18px;">
+                    <table class="table">
+                         <tr>
+                            <td>
+                                Adjuster Email:
+                            </td>
+                            <td>
+                                {{ job.adjuster.email }}
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>
+                                Claim #:
+                            </td>
+                            <td>
+                            {{ job.claim_number}}
+                        </tr>
+                        <tr>
+                            <td>
+                                Deductible:
+                            </td>
+                            <td>
+                                {{ job.deductible}}
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>
+                                Do We Collect:
+                            </td>
+                            <td>
+                                {% if job.do_we_collect %}
+                                Yes
+                                {% else %}
+                                No
+                                {% endif %}
+                            </td>
+                        </tr>
+                    </table>
+                </span>
+            </div>
+            <div class="row" style="border-bottom: 1px solid #EEE;">
+                <span class="col-sm-6">
+                    <h2>Other Information</h2>
+                    <table class="table" style="font-size: 18px;">
+                        <tr>
+                            <td>
+                                Emergency Requested?
+                            </td>
+                            <td>
+                                {% if job.emergency_requested %}
+                                Yes
+                                {% else %}
+                                No
+                                {% endif %}
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>
+                                PO #
+                            </td>
+                            <td>
+                                {{ job.po_number }}
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>
+                                Emergency Dispatch
+                            </td>
+                            <td>
+                                {{ job.emergency_dispatch }}
+                            </td>
+                        </tr>
+                        <tr>
+                    </table>
+                </span>
+                {% if job.additional_info %}
+                <span class="row col-sm-6">
+                    <h2>Description</h2>
+                    <p style="font-size: 16px;">
+                        {{ job.additional_info }}
+                    </p>
+                 </span>
+            {% endif %}
+            </div>
+        {% if show_notes %}
+        <div class="row">
+            {% include "job_notes.html" %}
+        </div>
+        {% endif %}
+    </body>
+
+</html>

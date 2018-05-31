@@ -1,0 +1,6 @@
+{% if original.id %}
+<div>
+    <a class="btn btn-success" href="{% url 'print_job' original.id %}">Print View</a>
+    <a class="btn btn-success" href="{% url 'print_job_with_notes' original.id %}">Print View with Notes</a>
+</div>
+{% endif %}

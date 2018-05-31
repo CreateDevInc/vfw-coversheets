@@ -1,0 +1,8 @@
+#!/bin/bash
+# This script is intended to get you going for development on a new ubuntu / mint machine. It doesn't promise anything
+# though. Make sure you know how virtual-env's work.
+apt-get install build-essential python-dev libpq-dev
+virtualenv vfw-env
+cd vfw-env
+./bin/activate
+pip install -r ./requirements.txt

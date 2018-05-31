@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html>
+
+<head lang="en">
+    <meta charset="UTF-8">
+    <title>Viewing Album</title>
+</head>
+
+<body>
+
+{% load thumbnail %}
+
+<link href="{{ STATIC_URL }}css/lightbox.css" rel="stylesheet" />
+
+{% for image in images %}
+    {% thumbnail image.image_file "200" as im %}
+        <a href="../../../media/{{image.image_file}}" data-lightbox="album" ><img src="{{ im.url }}" width="{{ im.width }}" height="{{ im.height }}"></a>
+    {% endthumbnail %}
+{% endfor %}
+<script type="text/javascript" src="{{ STATIC_URL }}js/jquery.js" ></script>
+<script type="text/javascript" src="{{ STATIC_URL }}js/lightbox.js"></script>
+</body>
+</html>

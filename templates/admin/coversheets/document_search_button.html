@@ -1,0 +1,5 @@
+{% if original.id %}
+<div>
+    <a class="btn btn-success" href="{% url 'admin:coversheets_document_changelist' %}?q=&jobsheet__id__exact={{ original.id }}">Search Documents</a>
+</div>
+{% endif %}
