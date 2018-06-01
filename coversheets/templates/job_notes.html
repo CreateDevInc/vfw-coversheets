@@ -1,0 +1,17 @@
+<h2>Job Notes</h2>
+<table class="table">
+<thead>
+    <tr>
+        <th class="col-sm-9">Comment</th>
+        <th class="col-sm-1">Author</th>
+        <th class="col-sm-2">Time</th>
+    </tr>
+</thead>
+{% for note in job.note_set.all %}
+    <tr>
+        <td>{{ note.comment }}</td>
+        <td>{{ note.created_by }}</td>
+        <td>{{ note.created_at }}</td>
+    </tr>
+{% endfor %}
+</table>

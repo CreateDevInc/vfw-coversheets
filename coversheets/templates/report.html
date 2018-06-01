@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html>
+
+<head lang="en">
+    <meta charset="UTF-8">
+    <title></title>
+
+</head>
+<body>
+{% load bootstrap3 %}
+{% bootstrap_css %}
+<script src="//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.js"></script>
+{% bootstrap_javascript %}
+
+{{ form.media }}
+
+{% block bootstrap3_content %}
+    <div class="container">
+<form action={% url 'reports' %} method="post" class="form">
+    {% csrf_token %}
+    {% bootstrap_form form %}
+    {% buttons %}
+            <button type="submit" class="btn btn-primary">
+                {% bootstrap_icon "star" %} Submit
+            </button>
+    {% endbuttons %}
+    </form>
+    </div>
+{% endblock %}
+    <script type="text/javascript">
+        $(document).ready(function() {
+            if ($("input:radio[name=date_type]").val() == 'last_days') {
+                $('#id_end_picker').parent().toggle();
+                $('#id_start_picker').parent().toggle();
+            }
+            else
+            {
+                $('#id_last_days').parent().toggle();
+            }
+
+            $('input[type=radio][name=date_type]').change(function() {
+                    $('#id_end_picker').parent().toggle();
+                    $('#id_start_picker').parent().toggle();
+                    $('#id_last_days').parent().toggle();
+            });
+
+            if ($('#id_show_all_statuses').is(":checked")) {
+                $('#id_statuses').parent().toggle();
+            }
+            $('#id_show_all_statuses').change(function() {
+                $('#id_statuses').parent().toggle();
+            });
+        });
+
+    </script>
+
+</body>
+</html>

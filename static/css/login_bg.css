@@ -1,0 +1,105 @@
+
+/*.table-striped>tbody>tr:nth-child(odd)>td,*/
+/*.table-striped>tbody>tr:nth-child(odd)>th {*/
+   /*background-color: #a6a0a2;*/
+ /*}*/
+
+/*.table-striped>tbody>tr:nth-child(even)>td,*/
+/*.table-striped>tbody>tr:nth-child(even)>th {*/
+   /*background-color: #3c3c3e;*/
+ /*}*/
+.login #wrap {
+    background: none
+}
+.login #content-main {
+    margin: 0;
+    box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.07);
+    border-radius: 4px;
+    background: #848b8f;
+    padding: 0;
+    position: absolute;
+    width: 340px;
+    left: 15%;
+    top: 15%;
+    margin-left: -170px;
+    margin-top: -100px;
+}
+.login #content-main h1 {
+    font-size: 14px;
+    font-weight: normal;
+    background-color: #4c5358;
+    background-repeat: no-repeat;
+    background-image: -webkit-gradient(linear, top, bottom, from(#450b0a), to(#0a103d));
+    background-image: -webkit-linear-gradient(right, #450b0a, #0a103d);
+    background-image: -moz-linear-gradient(right, #450b0a, #0a103d);
+    background-image: -o-linear-gradient(right, #450b0a, #0a103d);
+    background-image: -khtml-gradient(linear, top, bottom, from(#450b0a), to(#0a103d));
+    filter: progid: DXImageTransform.Microsoft.Gradient(StartColorStr='#450b0a', EndColorStr='#0a103d', GradientType=0);
+    -ms-filter: "progid:DXImageTransform.Microsoft.gradient(startColorStr='#450b0a', EndColorStr='#0a103d', GradientType=0))";
+    color: #e2e2e4;
+    text-shadow: 0 1px #4c5358;
+    padding: 0 15px;
+    margin: 0;
+    -moz-background-clip: padding;
+    -webkit-background-clip: padding-box;
+    background-clip: padding-box;
+    -webkit-border-top-left-radius: 4px;
+    -moz-border-radius-topleft: 4px;
+    border-top-left-radius: 4px;
+    -webkit-border-top-right-radius: 4px;
+    -moz-border-radius-topright: 4px;
+    border-top-right-radius: 4px
+}
+.login #content-main h1 i {
+    margin-right: 5px
+}
+.login #content-main form {
+    margin: 15px 15px 0
+}
+.login #content-main form input[type=text],
+.login #content-main form input[type=password] {
+    width: 90%
+}
+.login #content-main .submit-row {
+    background: rgba(76, 83, 88, 0.100);
+    margin: 10px -15px 0;
+    padding: 10px 15px;
+    border-top: 1px solid #848b8f;
+    box-shadow: inset 1px 1px 0 #4c5358;
+    -moz-background-clip: padding;
+    -webkit-background-clip: padding-box;
+    background-clip: padding-box;
+    -webkit-border-bottom-left-radius: 4px;
+    -moz-border-radius-bottomleft: 4px;
+    border-bottom-left-radius: 4px;
+    -webkit-border-bottom-right-radius: 4px;
+    -moz-border-radius-bottomright: 4px;
+    border-bottom-right-radius: 4px
+}
+.login #content-main .control-group {
+    border: 0
+}
+
+.header {
+    color: #d4d4d4;
+    height: 75px;
+    overflow: hidden;
+    text-shadow: 0 -1px #121414;
+    background-color: #373b3d;
+    background-repeat: no-repeat;
+    background-image: -webkit-gradient(linear, left top, right top, from(#450f11), to(#0a103d));
+    background-image: -webkit-linear-gradient(right center, #450b0a, #0a103d);
+    background-image: -moz-linear-gradient(right center, #450b0a, #0a103d);
+    background-image: -o-linear-gradient(left, #450b0a, #0a103d);
+    background-image: -khtml-gradient(linear, left top, right top, from(#450b0a), to(#0a103d));
+    filter: progid: DXImageTransform.Microsoft.Gradient(StartColorStr='#3f4345', EndColorStr='#373b3d', GradientType=1);
+    -ms-filter: "progid:DXImageTransform.Microsoft.gradient(startColorStr='#3f4345', EndColorStr='#373b3d', GradientType=1))"
+}
+
+body{
+    background-image: url("/static/img/valley_big_logo.jpg");
+	background-color: #000000;
+    background-size: 100% ;
+    background-repeat:no-repeat;
+    background-position: 25% 50%;
+}

@@ -1,0 +1,7 @@
+{% if original.id %}
+<div>
+    <a class="btn btn-success" href="{% url 'email_pic' %}?ids={% for img in original.image_set.all %}{{ img.id }}{% if not forloop.last %},{% endif %}{% endfor %}">Email Album</a>
+    <a class="btn btn-success" href="{% url 'admin:coversheets_image_changelist' %}?q=&album__id__exact={{ original.id }}">Search Images</a>
+</div>
+<br>
+{% endif %}

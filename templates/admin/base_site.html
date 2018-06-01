@@ -1,0 +1,41 @@
+{% extends "admin/base.html" %}
+{% load admin_static %}
+
+{# Additional <head> content here, some extra meta tags or favicon #}
+
+{# Additional CSS includes #}
+{% block extrastyle %}
+    <link rel="stylesheet" type="text/css" href="{% static 'css/darktheme.css' %}" media="all">
+{% endblock %}
+
+
+{# Additional JS files in footer, right before </body> #}
+{#{% block extrajs %}#}
+{#  <script type="text/javascript" src="{% static 'js/my_project.js' %}"></script>#}
+{#{% endblock %}#}
+
+
+{# Footer links (left side) #}
+{#{% block footer_links %}#}
+{#  <a href="/docs/" class="icon"><i class="icon-question-sign"></i>Documentation</a>#}
+{#{% endblock %}#}
+
+{# Additional header content like notifications or language switcher #}
+{% block header_content %}
+
+{% endblock %}
+
+{# Footer branding name (center) #}
+{% block footer_branding %}
+    Valley Services of Arizona
+{#    <img src="/static/img/valley_big_logo.jpg" width="25>#}
+{% endblock %}
+{% block footer_links %}
+To report bugs and for support <br>
+    <a href="mailto:amlozano1@gmail.com">Email Anthony</a>
+{% endblock %}
+
+{# Footer copyright (right side) #}
+{% block copyright %}
+  Copyright &copy; 2014 Valley Fire & Water Restorations Inc.<br>Developed by Anthony Lozano</a>
+{% endblock %}

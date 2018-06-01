@@ -1,0 +1,7 @@
+media/
+local/
+patch
+coversheets_dump.xls
+*.pyc
+
+secret
