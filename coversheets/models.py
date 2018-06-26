@@ -128,6 +128,7 @@ class Job(models.Model):
     mobile_phone_ext.verbose_name = 'ext.'
 
     customer_address = models.CharField(max_length=128, blank=True, null=True)
+    customer_address.verbose_name = 'Customer Mailing Address'
     city = models.ForeignKey(City, related_name="job_city_customer", blank=True, null=True)
     zip = models.CharField(max_length=10, blank=True, null=True)
 
