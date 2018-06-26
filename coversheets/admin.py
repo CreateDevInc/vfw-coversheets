@@ -14,6 +14,7 @@ from reversion.admin import VersionAdmin
 from relatedwidget import RelatedWidgetWrapperBase
 from django.contrib.auth.admin import UserAdmin
 from django.contrib.auth.models import User
+from rangefilter.filter import DateRangeFilter
 
 import coversheets.models
 from forms import AlbumUpload
@@ -24,7 +25,6 @@ UserAdmin.list_display = ('first_name', 'last_name', 'email', 'is_active')
 admin.site.unregister(User)
 admin.site.register(User, UserAdmin)
 
-
 # Default settings based on the user's environment.
 locale.setlocale(locale.LC_ALL, '')
 
@@ -33,10 +33,12 @@ admin.site.register(coversheets.models.ProgramType)
 admin.site.register(coversheets.models.Insurance)
 admin.site.register(coversheets.models.JobStatus)
 admin.site.register(coversheets.models.LossType)
+admin.site.register(coversheets.models.AdjusterType)
 admin.site.register(coversheets.models.ReferralType)
 
 admin.site.register(coversheets.models.DocumentSource)
 admin.site.register(coversheets.models.DocumentType)
+
 
 class AdjusterForm(ModelForm):
     class Meta:
@@ -51,23 +53,24 @@ class AdjusterForm(ModelForm):
 
 @admin.register(coversheets.models.Adjuster)
 class AdjusterAdmin(admin.ModelAdmin):
-    list_display = ['name', 'insurance_company', 'email']
+    list_display = ['name', 'insurance_company', 'email', 'adjuster_type']
     search_fields = ['name', 'insurance_company__name', 'email', 'phone', 'mobile']
     form = AdjusterForm
 
     fieldsets = (
-                    ('', {
-                            'fields': (
-                                            ('name',),
-                                            ('insurance_company',),
-                                            ('email',),
-                                            ('phone', 'phone_ext'),
-                                            ('mobile', 'mobile_ext'),
-                                            ('fax', 'fax_ext'),
-                                          )
-                            }
-                    ),
-                )
+        ('', {
+            'fields': (
+            ('name',),
+            ('adjuster_type', ),
+            ('insurance_company',),
+            ('email',),
+            ('phone', 'phone_ext'),
+            ('mobile', 'mobile_ext'),
+            ('fax', 'fax_ext'),
+            )
+        }
+        ),
+    )
 
 
 @admin.register(coversheets.models.Document)
@@ -118,7 +121,7 @@ class JobNoteAdmin(admin.ModelAdmin):
 class JobNoteInlineForm(ModelForm):
     class Meta:
         widgets = {
-            'comment': AutosizedTextarea(attrs={'class': 'input-medium', 'rows': 2, 'style': 'width:95%'})
+            'comment': AutosizedTextarea(attrs={'class': 'input-medium', 'rows': 5, 'style': 'width:95%'})
         }
 
 class JobNoteAdminViewInline(admin.TabularInline):
@@ -140,7 +143,6 @@ class JobNoteAdminViewInline(admin.TabularInline):
 
     def has_delete_permission(self, request, obj=None):
         return False
-
 
 
 class JobNoteAdminAddInline(admin.StackedInline):
@@ -231,7 +233,7 @@ class AlbumAddAdminInline(AdminImageMixin, admin.TabularInline):
     form = AlbumUpload
     extra = 0
     readonly_fields = ['pictures']
-    suit_classes = 'suit-tab suit-tab-job_info'
+    suit_classes = 'suit-tab suit-tab-albums'
 
     def has_change_permission(self, request, obj=None):
         return False
@@ -242,7 +244,7 @@ class AlbumAdminViewInline(AdminImageMixin, admin.TabularInline):
     extra = 0
     model = coversheets.models.Album
     readonly_fields = ['pictures']
-    suit_classes = 'suit-tab suit-tab-job_info'
+    suit_classes = 'suit-tab suit-tab-albums'
 
     def has_add_permission(self, request):
         return False
@@ -287,7 +289,6 @@ class SuperFilter(admin.SimpleListFilter):
         else:
             queryset.all()
 
-
 class JobForm(ModelForm):
     estimator = CustomUserChoiceField(queryset=User.objects.filter(groups__name='Estimators', is_active=True).order_by('first_name'), required=False)
     super = CustomUserChoiceField(queryset=User.objects.filter(groups__name='Superintendents', is_active=True).order_by('first_name'), required=False)
@@ -298,7 +299,7 @@ class JobForm(ModelForm):
         cleaned_data = super(JobForm, self).clean()
         same_as_loss_addr = cleaned_data.get("same_as_loss_address")
         if not same_as_loss_addr:
-            if (cleaned_data.get('address') is None or
+            if (cleaned_data.get('customer_address') is None or
                         cleaned_data.get('city') is None or
                         cleaned_data.get('zip') is None):
                 raise ValidationError('Must include mailing address or mark same as loss address')
@@ -308,14 +309,33 @@ class JobForm(ModelForm):
     class Meta:
         widgets = {
             'additional_info': AutosizedTextarea(attrs={'style': 'width:55%'}),
-            'directions': AutosizedTextarea(attrs={'style': 'width:55%'}),
+            'loss_information': AutosizedTextarea(attrs={'style': 'width:55%'}),
             'entry_date': AmPmSuitSplitDateTimeWidget(),
             'primary_phone_ext': TextInput(attrs={'style': 'width:60px'}),
             'mobile_phone_ext': TextInput(attrs={'style': 'width:60px'}),
-            'customer_phone_ext': TextInput(attrs={'style': 'width:60px'}),
-            'customer_mobile_ext': TextInput(attrs={'style': 'width:60px'}),
+            'contact_info_1_ext': TextInput(attrs={'style': 'width:60px'}),
+            'contact_info_2_ext': TextInput(attrs={'style': 'width:60px'}),
             #DateTimePicker(options={"format": "YYYY-MM-DD", "pickTime": True})
         }
+
+
+class JobStatusFilter(admin.SimpleListFilter):
+    title = 'Show Declined Jobs'
+    parameter_name = 'show_declined'
+    template = 'job_status_filter.html'
+
+    def lookups(self, request, model_admin):
+        return (
+            ('a', 'b'),
+            ('c', 'd')
+        )
+
+    def queryset(self, request, queryset):
+        show = request.GET.get('show_declined')
+        if show:
+            return queryset.all()
+        else:
+            return queryset.exclude(status__status='Declined')
 
 
 @admin.register(coversheets.models.Job)
@@ -323,19 +343,100 @@ class JobAdmin(RelatedWidgetWrapperBase, VersionAdmin):
     form = JobForm
     list_per_page = 50
     ordering = ('-entry_date',)
-    list_display = ["customer", "loss_address", "entry_date", "job_number_or_empty_string", "estimator_name", "super_name",
-                    "insurance_company", "loss_type", "status", "value", "program_type",]
+    list_display = [
+        "customer",
+        "loss_address",
+        "city",
+        "loss_zip",
+        "entry_date",
+        "job_number_or_empty_string",
+        "estimator_name",
+        "super_name",
+        "insurance_company",
+        "loss_type",
+        "status",
+        "value",
+        "program_type"
+    ]
 
-    list_filter = ['entry_date', EstimatorFilter, SuperFilter, 'status']
+    list_filter = [
+        EstimatorFilter,
+        SuperFilter,
+        'status',
+        JobStatusFilter,
+        ('entry_date', DateRangeFilter),
+    ]
 
-    search_fields = ['additional_info', 'customer', 'contact', 'emergency_dispatch', "loss_address", "id",
-                     'info_entered_at', "customer", "primary_phone", "mobile_phone", "claim_number", "adjuster__name",
-                     "customer_phone", "customer_mobile", "job_number", "insurance_company__name"]
+    search_fields = [
+        'additional_info',
+        'customer',
+        'customer_address',
+        # 'city',
+        # 'zip',
+        'customer_email',
+        'contact',
+        'contact_email',
+        'emergency_dispatch',
+        'loss_address',
+        # 'loss_city__name',
+        'id',
+        'info_entered_at',
+        'customer',
+        'primary_phone',
+        'mobile_phone',
+        'claim_number',
+        'adjuster__name',
+        'adjuster__email',
+        'adjuster__phone',
+        'adjuster__mobile',
+        'adjuster__fax',
+        'contact_info_1',
+        'contact_info_2',
+        'job_number',
+        'insurance_company__name',
+        'claim_date',
+        'claim_number',
+        'policy_number',
+        'deductible',
+        'contact_info_1',
+        'contact_info_2',
+        'job_number',
+        'program_type__type',
+        'called_in_by',
+        'loss_type__type',
+        'estimated_loss',
+        'referral_type__type',
+        'referred_by',
+        'estimator',
+        'super',
+        'production_manager',
+    ]
 
-    suit_form_tabs = (('job_info', 'Job info',), ('notes', 'Notes'), ('docs', 'Documents'))
+
+    suit_form_tabs = (
+        ('job_info', 'Job info',),
+        ('notes', 'Notes'),
+        ('docs', 'Documents'),
+        ('albums', 'Albums')
+    )
     inlines = (DocumentAdminAddInline, DocumentAdminViewInline, JobNoteAdminAddInline, JobNoteAdminViewInline, AlbumAddAdminInline, AlbumAdminViewInline)
-    readonly_fields = ("info_updated_by", "info_taken_by", "info_updated_at", "info_entered_at", "pictures",
-                       'adjuster_phone', 'adjuster_mobile', 'adjuster_fax', 'adjuster_email', 'job_number_or_empty_string', 'map')
+    readonly_fields = (
+        'info_updated_by',
+        'info_taken_by',
+        'info_updated_at',
+        'info_entered_at',
+        'pictures',
+        'adjuster_phone',
+        'adjuster_mobile',
+        'adjuster_fax',
+        'adjuster_email',
+        'ind_adjuster_phone',
+        'ind_adjuster_mobile',
+        'ind_adjuster_fax',
+        'ind_adjuster_email',
+        'job_number_or_empty_string',
+        'map'
+    )
 
     suit_form_includes = (
         ('admin/coversheets/print_job_button.html', 'top', 'job_info'),
@@ -343,71 +444,88 @@ class JobAdmin(RelatedWidgetWrapperBase, VersionAdmin):
     )
 
     fieldsets = (
-                ('Created by', {
-                            'classes': ('suit-tab suit-tab-job_info',),
-                            'fields': ('entry_date', 'info_entered_at', 'info_taken_by', )
-                         }
-                ),
-                ('Last Update', {
-                            'classes': ('suit-tab suit-tab-job_info',),
-                            'fields': ('status', 'info_updated_by', 'info_updated_at', 'job_number', 'add_job_number')
-                         }
-                ),
-                ('Asssignments', {
-                            'classes': ('suit-tab suit-tab-job_info',),
-                            'fields': ('estimator', 'super', 'production_manager')
-                         }
-                ),
+        ('Customer/Contact Information',  {
+            'classes': ('suit-tab suit-tab-job_info',),
+            'fields': (
+                ('customer', 'customer_email'),
+                ('contact_info_1', 'contact_info_1_ext'),
+                ('contact_info_2', 'contact_info_2_ext'),
+                ('contact', 'contact_email'),
+                ('primary_phone', 'primary_phone_ext',),
+                ('mobile_phone', 'mobile_phone_ext'),
+                ('same_as_loss_address'),
+                ('customer_address', 'city', 'zip')),
+        }),
 
-                ('Call Data', {
-                            'classes': ('suit-tab suit-tab-job_info',),
-                            'fields': (('program_type', 'called_in_by'), ('loss_type', 'estimated_loss'),
-                                       ('referral_type', 'referred_by'),)
-                         }
-                 ),
+        ('Loss Location', {
+            'classes': ('suit-tab suit-tab-job_info',),
+            'fields': ('loss_address', 'loss_city', 'loss_zip', 'loss_information', 'loss_year_built', 'map'),
+        }),
 
-                 ('Customer', {
-                        'classes': ('suit-tab suit-tab-job_info',),
-                        'fields': (('customer', 'customer_email'),
-                                   ('customer_phone', 'customer_phone_ext'),
-                                   ('customer_mobile', 'customer_mobile_ext')),
-                      }
-                 ),
-                 ('Loss Location', {
-                        'classes': ('suit-tab suit-tab-job_info',),
-                        'fields': ('loss_address', 'loss_city', 'loss_zip', 'directions', 'map'),
-                      }
-                 ),
-                 ('Contact',  {
-                        'classes': ('suit-tab suit-tab-job_info',),
-                        'fields': (('contact', 'contact_email'),
-                                   ('primary_phone', 'primary_phone_ext',),
-                                   ('mobile_phone', 'mobile_phone_ext'),
-                                   ('same_as_loss_address'),
-                                   ('address', 'city', 'zip')),
-                      }
-                 ),
+        ('', {
+            'classes': ('suit-tab suit-tab-job_info',),
+            'fields':  ('additional_info',),
+        }),
 
-                 ('Insurance', {
-                        'classes': ('suit-tab suit-tab-job_info',),
-                        'fields': ('insurance_company', 'adjuster', 'adjuster_email', 'adjuster_phone', 'adjuster_mobile', 'adjuster_fax', 'claim_date', 'claim_number', 'policy_number', ('deductible', 'deductible_collected',) ),
-                      }
-                 ),
-                 ('', {
-                        'classes': ('suit-tab suit-tab-job_info',),
-                        'fields': ( 'emergency_requested', 'emergency_dispatch'),
-                      }
-                 ),
-                 ('', {
-                        'classes': ('suit-tab suit-tab-job_info',),
-                        'fields':  ('additional_info',),
-                      }
-                 ),
-                 ('', {
-                        'classes': ('suit-tab suit-tab-job_info',),
-                        'fields':  ((),),
-                      }
-                 ),
+        ('Insurance', {
+            'classes': ('suit-tab suit-tab-job_info',),
+            'fields': (
+                'insurance_company',
+                ('adjuster', 'independent_adjuster'),
+                ('adjuster_email', 'ind_adjuster_email'),
+                ('adjuster_phone', 'ind_adjuster_phone'),
+                ('adjuster_mobile', 'ind_adjuster_mobile'),
+                ('adjuster_fax', 'ind_adjuster_fax'),
+                'claim_date',
+                'claim_number',
+                'policy_number',
+                'deductible'
+            ),
+        }),
+
+        ('Call Data', {
+            'classes': ('suit-tab suit-tab-job_info',),
+            'fields': (('program_type', 'called_in_by'), ('loss_type', 'estimated_loss'), ('referral_type', 'referred_by'),)
+        }),
+
+        ('Assignments', {
+            'classes': ('suit-tab suit-tab-job_info',),
+            'fields': ('estimator', 'super', 'production_manager')
+        }),
+
+        ('Job Info', {
+            'classes': ('suit-tab suit-tab-job_info',),
+            'fields': (
+                'percent_complete',
+                'estimated_completion_date',
+                'program_due_date',
+                'production_start_date',
+                'pending_items',
+                'album_link',
+                'budget_link',
+                'schedule_link'
+            )
+        }),
+
+        ('Last Update', {
+            'classes': ('suit-tab suit-tab-job_info',),
+            'fields': ('status', 'info_updated_by', 'info_updated_at', 'job_number', 'add_job_number')
+        }),
+
+        ('Created by', {
+            'classes': ('suit-tab suit-tab-job_info',),
+            'fields': ('entry_date', 'info_entered_at', 'info_taken_by', )
+        }),
+
+        ('', {
+            'classes': ('suit-tab suit-tab-job_info',),
+            'fields': ( 'emergency_requested', 'emergency_dispatch'),
+        }),
+
+        ('', {
+            'classes': ('suit-tab suit-tab-job_info',),
+            'fields':  ((),),
+        }),
     )
 
     def map(self, obj):
@@ -449,6 +567,34 @@ class JobAdmin(RelatedWidgetWrapperBase, VersionAdmin):
     def adjuster_fax(self, obj):
         if obj.adjuster is not None:
             return obj.adjuster.full_fax()
+        else:
+            return ''
+
+    def ind_adjuster_phone(self, obj):
+        if obj.independent_adjuster is not None:
+            return obj.independent_adjuster.full_phone()
+        else:
+            return ''
+
+    def ind_adjuster_email(self, obj):
+        if obj.independent_adjuster is not None:
+            if obj.claim_number is not None:
+                return '<a href=mailto:{0}?Subject={1}.%20Claim%20#%20{2}>{0}</a>'.format(obj.independent_adjuster.email, urllib.quote(obj.customer), urllib.quote(obj.claim_number))
+            else:
+                return '<a href=mailto:{0}?Subject={1}>{0}</a>'.format(obj.independent_adjuster.email, obj.customer)
+        else:
+            return ''
+    ind_adjuster_email.allow_tags = True
+
+    def ind_adjuster_mobile(self, obj):
+        if obj.independent_adjuster is not None:
+            return obj.independent_adjuster.full_mobile()
+        else:
+            return ''
+
+    def ind_adjuster_fax(self, obj):
+        if obj.independent_adjuster is not None:
+            return obj.independent_adjuster.full_fax()
         else:
             return ''
 
@@ -508,11 +654,11 @@ class JobAdmin(RelatedWidgetWrapperBase, VersionAdmin):
         :param change:
         :return:
         """
-        if obj.city == '' or obj.address == '' or obj.zip == '':
+        if obj.city == '' or obj.customer_address == '' or obj.zip == '':
             # The only way that this can be blank is if the "same as loss address" box was checked, so copy the
             # information from loss address into the contact address.
             obj.city = obj.loss_city
-            obj.address = obj.loss_address
+            obj.customer_address = obj.loss_address
             obj.zip = obj.loss_zip
 
         if obj.adjuster is not None and obj.adjuster.insurance_company_id is not None:

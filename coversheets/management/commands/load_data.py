@@ -273,7 +273,7 @@ def load_job_sheets(sheet):
             kwargs["loss_city"] = sheet.cell(row, 17).value
             # kwargs["loss_state"] = sheet.cell(row, 18).value
             kwargs["loss_zip"] = sheet.cell(row, 19).value
-            kwargs["directions"] = sheet.cell(row, 20).value
+            kwargs["loss_information"] = sheet.cell(row, 20).value
 
             # mailing
             kwargs["address"] = sheet.cell(row, 22).value
@@ -677,5 +677,3 @@ class Command(NoArgsCommand):
 
     def handle_noargs(self, **options):
         load_all()
-
-

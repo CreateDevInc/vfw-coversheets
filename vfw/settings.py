@@ -12,13 +12,13 @@ https://docs.djangoproject.com/en/1.7/ref/settings/
 import os
 from django.conf import global_settings
 BASE_DIR = os.path.dirname(os.path.dirname(__file__))
-
+PROJECT_DIR = os.path.dirname(__file__)
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/1.7/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = '' # removed to commit to github
+SECRET_KEY = 'asdfasfdasdfasdfasdfasdfasdfasdfasdfasdfasfd' # removed to commit to github
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
@@ -27,8 +27,10 @@ TEMPLATE_DEBUG = True
 
 ALLOWED_HOSTS = []
 
-ADMINS = (('Anthony-vfw', 'lockes5hadow@gmail.com'),)
-SERVER_EMAIL = 'coversheets@vs-az.com'
+# ADMINS = (('Anthony-vfw', 'lockes5hadow@gmail.com'),)
+# SERVER_EMAIL = 'coversheets@vs-az.com'
+ADMINS = (('kyle', 'kyle@example.com'),)
+SERVER_EMAIL = 'server@example.com'
 
 # Application definition
 
@@ -56,6 +58,7 @@ INSTALLED_APPS = (
     'debug_toolbar',
     'multi_email_field',
     'datetimewidget',
+    'rangefilter'
 )
 
 MIDDLEWARE_CLASSES = (
@@ -80,13 +83,21 @@ MAX_UPLOAD_SIZE = "52428800"
 # Database
 # https://docs.djangoproject.com/en/1.7/ref/settings/#databases
 
+# DATABASES = {
+#     'default': {
+#         'ENGINE': 'django.db.backends.sqlite3',
+#         'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
+#     }
+# }
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
+        'ENGINE': 'django.db.backends.postgresql_psycopg2',
+        'NAME': 'vfw',
+        'USER': 'kyle',
+        'HOST': 'localhost',
+        'PORT': ''
     }
 }
-
 
 from django.contrib.sites.models import Site
 #new_site = Site.objects.create(domain='brozano.com', name='brozano.com')
@@ -117,9 +128,10 @@ TIME_INPUT_FORMATS = (
 # https://docs.djangoproject.com/en/1.7/howto/static-files/
 
 STATIC_URL = '/static/'
-STATIC_ROOT = 'C:\\Users\\Anthony\\PycharmProjects\\vfw\\collected_staticfiles'
+# STATIC_ROOT = 'C:\\Users\\Anthony\\PycharmProjects\\vfw\\collected_staticfiles'
+STATIC_ROOT= os.path.join(PROJECT_DIR, 'collected_staticfiles')
 STATICFILES_DIRS = (
-    os.path.join(BASE_DIR, "static"),
+    os.path.join(BASE_DIR, "coversheets/static"),
 )
 
 MEDIA_ROOT = '/media/'
@@ -143,18 +155,24 @@ THUMBNAIL_HIGH_RESOLUTION = True
 
 ## suit
 
+
 SUIT_CONFIG = {
     'SEARCH_URL': '/admin/coversheets/job/',
-    'ADMIN_NAME': '<img src="/static/img/v_only.png"> Valley Services of Arizona',
+    'ADMIN_NAME': 'Valley Services of Arizona',
     'HEADER_TIME_FORMAT': 'P',
     'MENU_ICONS': {
         'coversheets': 'icon-list',
         'auth': 'icon-lock',
     },
     'MENU_EXCLUDE': {'cities_light', },
-    'MENU': ({'app': 'coversheets', 'icon': 'icon-list', 'models': ('job', 'adjuster', 'album', 'calltype', 'referraltype')},
-             {'app': 'auth', 'label': 'Users'},
-             {'label': 'Reports', 'url': '/coversheets/reports'}
+    'MENU': (
+        {'app': 'coversheets', 'icon': 'icon-list', 'models': ('job', 'adjuster', 'album', 'calltype', 'referraltype')},
+        {'label': 'New Coversheet', 'url': '/admin/coversheets/job/add/', 'icon': 'icon-plus'},
+        {'app': 'auth', 'label': 'Users'},
+        {'label': 'Reports', 'url': '/coversheets/reports'},
+        {'label': 'Weekly Production List'},
+        {'label': 'Estimator Snapshot'},
+        {'label': 'Warranty List'},
     )
 }
 TIME_ZONE = 'America/Phoenix'
@@ -175,11 +193,15 @@ LIGHTBOX_APP = 'coversheets'
 ## Email config
 EMAIL_BACKEND = 'django_ses.SESBackend'
 
-DEFAULT_FROM_EMAIL = 'amlozano1@vs-az.com'
-DEFAULT_TO_EMAIL = 'amlozano1@gmail.com'
+# DEFAULT_FROM_EMAIL = 'amlozano1@vs-az.com'
+# DEFAULT_TO_EMAIL = 'amlozano1@gmail.com'
+DEFAULT_FROM_EMAIL = 'email@example.com'
+DEFAULT_TO_EMAIL = 'email@example.com'
 
-AWS_SES_ACCESS_KEY_ID = 'AKIAJQLJ2UR3SQJZWKPA'
-AWS_SES_SECRET_ACCESS_KEY = 'anXqLnragGW8bh7B4yje/ba70MGoZJiCqZyZKqtc'
+# AWS_SES_ACCESS_KEY_ID = 'AKIAJQLJ2UR3SQJZWKPA'
+# AWS_SES_SECRET_ACCESS_KEY = 'anXqLnragGW8bh7B4yje/ba70MGoZJiCqZyZKqtc'
+AWS_SES_ACCESS_KEY_ID = 'fake'
+AWS_SES_SECRET_ACCESS_KEY = 'fake'
 
 AWS_SES_REGION_NAME = 'us-west-2'
 AWS_SES_REGION_ENDPOINT = 'email.us-west-2.amazonaws.com'

@@ -1,6 +1,27 @@
-{% if original.id %}
+<script src="https://cdn.jsdelivr.net/npm/clipboard@2/dist/clipboard.min.js"></script>
+<script>
+function getCustomerName() {
+  return $('#id_customer').val();
+}
+
+function getCustomerAddress() {
+  return (
+    $('#id_customer_address').val() + ' ' +
+    $('#id_city').find(":selected").text() + ' ' +
+    $('#id_zip').val()
+  );
+}
+
+new ClipboardJS('#copy-customer', {
+  text: function(trigger) {
+    return getCustomerName() + ' ' + getCustomerAddress();
+  }
+});
+</script>
 <div>
+  {% if original.id %}
     <a class="btn btn-success" href="{% url 'print_job' original.id %}">Print View</a>
     <a class="btn btn-success" href="{% url 'print_job_with_notes' original.id %}">Print View with Notes</a>
+  {% endif %}
+    <a id="copy-customer" class="btn btn-success" href="#">Copy Customer Info</a>
 </div>
-{% endif %}

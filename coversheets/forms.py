@@ -33,18 +33,31 @@ class AlbumUpload(ModelForm):
 
 
 class Report(Form):
-    choices = [['Adjuster', 'Adjusters'],
-               ['Entry Date', 'Entry Date'],
-               ['Estimator', 'Estimator'],
-               ['Superintendent', 'Superintendent'],
-               ['InsuranceCo', 'InsuranceCo'],
-               ['LossType', 'LossType'],
-               ['Program', 'Program'],
-               ['Referral', 'Referral'],
-               ['Status', 'Status']
-              ]
-    group_by = ChoiceField(choices=choices)
-    # sort_by = ChoiceField(choices=choices)
+    sort_choices = [
+        ['Adjuster', 'Adjusters'],
+        ['Entry Date', 'Entry Date'],
+        ['Estimator', 'Estimator'],
+        ['Superintendent', 'Superintendent'],
+        ['InsuranceCo', 'InsuranceCo'],
+        ['LossType', 'LossType'],
+        ['Program', 'Program'],
+        ['Referral', 'Referral'],
+        ['Status', 'Status']
+    ]
+    group_choices = [
+        ['Adjuster', 'Adjusters'],
+        ['Entry Date', 'Entry Date'],
+        ['Estimator', 'Estimator'],
+        ['Superintendent', 'Superintendent'],
+        ['InsuranceCo', 'InsuranceCo'],
+        ['LossType', 'LossType'],
+        ['Program', 'Program'],
+        ['Referral', 'Referral'],
+        ['Status', 'Status']
+    ]
+
+    group_by = ChoiceField(choices=group_choices)
+    sort_by = ChoiceField(choices=sort_choices)
     date_type = ChoiceField(choices=[['last_days', 'Recent'],
                                      ['date_range', "Date Range"]], widget=RadioSelect(), initial='last_days')
     last_days = ChoiceField(choices=[[7,7], [30, 30], [365, 365]])

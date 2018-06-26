@@ -1,7 +1,9 @@
 media/
 local/
+venv/
 patch
 coversheets_dump.xls
 *.pyc
+*.sqlite3
 
 secret

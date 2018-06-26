@@ -1,6 +1,6 @@
 <!DOCTYPE html>
 <html xmlns="http://www.w3.org/1999/html">
-    
+
     <head>
         <meta charset="utf-8">
         <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -16,9 +16,16 @@
         <link href="http://pingendo.github.io/pingendo-bootstrap/themes/default/bootstrap.css"
         rel="stylesheet" type="text/css">
     </head>
-    
     <body>
+      <style>
+        @media print {
+          .no-print, .no-print * { display: none !important; }
+        }
+      </style>
         <div class="container">
+            <button style="margin-top: 10px;" class="btn btn-success no-print" onclick="window.print()">
+              Print
+            </button>
             <h1>
                 <span> Valley Fire &amp; Water Restorations Inc</span>
                 <span class="pull-right"><img src="/static/img/v_only_100.png"></span>
@@ -73,8 +80,8 @@
                 </div>
                 <div class="col-sm-4">
                     <h4>{{ job.customer }}</h4><br>
-                    <h4>{{ job.customer_phone }}</h4><br>
-                    <h4>{{ job.customer_mobile }}</h4><br>
+                    <h4>{{ job.contact_info_1 }}</h4><br>
+                    <h4>{{ job.contact_info_2 }}</h4><br>
                     <h4>{{ job.customer_email }}</h4>
                 </div>
                 <div class="col-sm-2">
@@ -97,7 +104,7 @@
                 <div class="col-sm-4" style="font-size: 16px;">
                     {{ job.loss_address }}<br>
                     {{ job.loss_city.name }}, {{ job.loss_city.region.geoname_code }}. {{ job.loss_zip }}<br>
-                    {{ job.directions }}
+                    {{ job.loss_information }}
                 </div>
                 <div class="col-sm-2" style="font-size: 18px; font-weight: 700;">
                     Mailing Address:

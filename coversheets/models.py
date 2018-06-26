@@ -10,7 +10,7 @@ from django.conf import settings
 from django.core.mail import send_mail
 from django.core import urlresolvers
 from email.utils import formataddr
-# Create your models here.
+import datetime
 
 
 class ProgramType(models.Model):
@@ -44,6 +44,16 @@ class LossType(models.Model):
         ordering = ['loss_type']
 
 
+class AdjusterType(models.Model):
+    adjuster_type = models.CharField(max_length=255)
+
+    def __str__(self):
+        return self.adjuster_type
+
+    class Meta:
+        ordering = ['adjuster_type']
+
+
 class ReferralType(models.Model):
     referral_type = models.CharField(max_length=255)
 
@@ -58,13 +68,13 @@ class Job(models.Model):
     info_taken_by = CurrentUserField(add_only=True, related_name="created_job", blank=True)
     info_updated_by = CurrentUserField(related_name="updated_job", blank=True)
 
-    info_entered_at = models.DateTimeField(auto_now_add=True, null=True)
-    info_updated_at = models.DateTimeField(auto_now=True, null=True)
+    info_entered_at = models.DateTimeField(auto_now_add=True, null=True, blank=True)
+    info_updated_at = models.DateTimeField(auto_now=True, null=True, blank=True)
 
-    entry_date = models.DateTimeField()
+    entry_date = models.DateTimeField(default=datetime.datetime.now, null=True, blank=True)
 
-    status = models.ForeignKey(JobStatus)
-    add_job_number = models.BooleanField(default=False)
+    status = models.ForeignKey(JobStatus, null=True, blank=True)
+    add_job_number = models.BooleanField(default=False, blank=True)
     job_number = models.PositiveIntegerField(unique=True, null=True, blank=True)
 
     # Assignments, Users in the system that have these groups can be assigned here.
@@ -75,30 +85,41 @@ class Job(models.Model):
     production_manager = models.ForeignKey("auth.User", blank=True, null=True, limit_choices_to={'groups__name': "Production Managers",
                                                                                         'is_active': True}, related_name="job_project_manager")
 
+    percent_complete = models.CharField(max_length=255, null=True, blank=True)
+    estimated_completion_date = models.DateField(null=True, blank=True)
+    program_due_date = models.DateField(null=True, blank=True)
+    production_start_date = models.DateField(null=True, blank=True)
+    pending_items = models.CharField(max_length=1000, null=True, blank=True)
+    album_link = models.CharField(max_length=255, null=True, blank=True)
+    budget_link = models.CharField(max_length=512, null=True, blank=True)
+    schedule_link = models.CharField(max_length=512, null=True, blank=True)
+
     #Call info
 
-    program_type = models.ForeignKey(ProgramType, )
-    called_in_by = models.CharField(max_length=200)
-    loss_type = models.ForeignKey(LossType, )
+    program_type = models.ForeignKey(ProgramType, blank=True)
+    called_in_by = models.CharField(max_length=200, blank=True)
+    loss_type = models.ForeignKey(LossType, blank=True)
     estimated_loss = models.DecimalField(max_digits=15, decimal_places=2, null=True, blank=True)
-    referral_type = models.ForeignKey(ReferralType, null=True, )
+    referral_type = models.ForeignKey(ReferralType, null=True, blank=True)
     referred_by = models.CharField(max_length=255, blank=True)
 
     #Customer and contact info
-    customer = models.CharField(max_length=255)
+    customer = models.CharField(max_length=255, blank=True)
     customer_email = models.EmailField(blank=True)
-    customer_phone = PhoneNumberField(blank=True, null=True)
-    customer_phone_ext = models.CharField(max_length=64, blank=True)
-    customer_phone_ext.verbose_name = 'ext.'
+    contact_info_1 = PhoneNumberField(blank=True, null=True)
+    contact_info_1_ext = models.CharField(max_length=64, blank=True)
+    contact_info_1.verbose_name = 'Best Contact Phone'
+    contact_info_1_ext.verbose_name = 'ext.'
 
-    customer_mobile = PhoneNumberField(blank=True, null=True)
-    customer_mobile_ext = models.CharField(max_length=64, blank=True)
-    customer_mobile_ext.verbose_name = 'ext.'
+    contact_info_2 = PhoneNumberField(blank=True, null=True)
+    contact_info_2_ext = models.CharField(max_length=64, blank=True)
+    contact_info_2.verbose_name = 'Addtional Contact Phone'
+    contact_info_2_ext.verbose_name = 'ext.'
 
     contact = models.CharField(max_length=255, null=True, blank=True)
     contact_email = models.EmailField(blank=True)
 
-    primary_phone = PhoneNumberField()
+    primary_phone = PhoneNumberField(blank=True)
     primary_phone_ext = models.CharField(max_length=64, blank=True)
     primary_phone_ext.verbose_name = 'ext.'
 
@@ -106,26 +127,28 @@ class Job(models.Model):
     mobile_phone_ext = models.CharField(max_length=64, blank=True)
     mobile_phone_ext.verbose_name = 'ext.'
 
-    address = models.CharField(max_length=128, blank=True, null=True)
+    customer_address = models.CharField(max_length=128, blank=True, null=True)
     city = models.ForeignKey(City, related_name="job_city_customer", blank=True, null=True)
     zip = models.CharField(max_length=10, blank=True, null=True)
 
-    loss_address = models.CharField(max_length=128)
-    loss_city = models.ForeignKey(City, related_name="job_city_loss")
-    loss_zip = models.CharField(max_length=10)
-    directions = models.TextField(max_length=4000, blank=True)
+    loss_address = models.CharField(max_length=128, blank=True)
+    loss_city = models.ForeignKey(City, related_name="job_city_loss", blank=True)
+    loss_zip = models.CharField(max_length=10, blank=True)
+    loss_year_built = models.DateField(null=True, blank=True)
+    loss_information = models.TextField(max_length=4000, blank=True)
 
     # insurance information
     adjuster = models.ForeignKey('Adjuster', null=True, blank=True)
+    independent_adjuster = models.ForeignKey('Adjuster', null=True, blank=True, related_name='independent_adjuster')
     insurance_company = models.ForeignKey("Insurance", null=True, blank=True)
 
     claim_date = models.DateField(blank=True, null=True)
     claim_number = models.CharField(max_length=255, blank=True)
     deductible = models.DecimalField(max_digits=16, decimal_places=2, null=True, blank=True)
-    deductible_collected = models.BooleanField(default=False, null=False)
+    deductible_collected = models.BooleanField(default=False, null=False, blank=True)
     policy_number = models.CharField(max_length=255, blank=True)
 
-    emergency_requested = models.BooleanField(default=False, null=False)
+    emergency_requested = models.BooleanField(default=False, null=False, blank=True)
     emergency_dispatch = models.CharField(max_length=255, blank=True)  # Strange field that can be used for user names, company names, or a description of what happened for the emergency.
     additional_info = models.TextField(max_length=4000, blank=True)
 
@@ -158,6 +181,7 @@ class Job(models.Model):
 
 class Adjuster(models.Model):
     name = models.CharField(max_length=255)
+    adjuster_type = models.ForeignKey("AdjusterType", null=True)
     phone = PhoneNumberField(blank=True)
     phone_ext = models.CharField(max_length=64, blank=True)
     phone_ext.verbose_name = 'ext.'

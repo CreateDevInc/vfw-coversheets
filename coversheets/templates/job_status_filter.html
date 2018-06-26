@@ -1,0 +1,10 @@
+{% load i18n %}
+<script>
+  $(document).ready(() => {
+    console.log('location.search', location.search);
+    if (location.search.includes('show_declined')) {
+      $('#show-declined').prop('checked', true);
+    }
+  })
+</script>
+<input id="show-declined" type="checkbox" name="show_declined" value="1" style="margin-right:3px;">Show Declined

@@ -7,13 +7,14 @@ from django.contrib.auth.decorators import login_required
 from django.core.urlresolvers import reverse
 from django.core.mail import send_mail, EmailMessage
 from django.shortcuts import render
-from django.http import HttpResponse, HttpResponseRedirect
+from django.http import HttpResponse, HttpResponseRedirect, JsonResponse
 from forms import AlbumUpload, Report, EmailObjs
 from models import Image, Job, Adjuster, JobStatus, User, Insurance, LossType, ProgramType, ReferralType, Document
 from itertools import groupby
+from operator import itemgetter
 from pytz import timezone
+from numpy import mean, amax, amin, sum
 
-# Create your views here.
 
 def home(request):
     return HttpResponse("Hello world")
@@ -30,172 +31,141 @@ def add_album(request):
         form = AlbumUpload(request.POST, files=request.FILES)
         if form.is_valid():
             form.save()
-        #     album = Album(form['cleaned_data'].album_name)
-        #     album.save()
-        #     images = [Image(image_file=file, album=album, uploaded_by=request.user) for file in file_list]
-        #     for image in images:
-        #         image.save()
         return render(request, "multi_upload_template.html", {'form': form})
     else:
         return render(request, "multi_upload_template.html", {'form': AlbumUpload()})
 
+def get_object_name(name):
+    names = {
+        'InsuranceCo': 'insurance_company',
+        'Adjuster': 'adjuster',
+        'Estimator': 'estimator',
+        'Superintendent': 'super',
+        'LossType': 'loss_type',
+        'Program': 'program_type',
+        'Referral': 'referred_by',
+        'Status': 'status',
+        'Entry Date': 'entry_date',
+    }
+    return names[name]
 
-def by_entry_date(request, start, end, show_empty, show_most_recent_note, statuses):
-    midnight = time(tzinfo=timezone('US/Arizona'))
-    tables = []
-    one_day = timedelta(days=1)
-    datetimes = [datetime.combine(start + timedelta(days=days), midnight) for days in range((end-start).days)]
-    sections = []
-    for start_datetime in datetimes:
-        tables = []
-        for status in statuses:
-            table = {'status': status}
-            end_datetime = start_datetime + one_day
-            jobs_of_the_day = Job.objects.filter(entry_date__gt=start_datetime,
-                                                 entry_date__lt=end_datetime,
-                                                 status=status).select_related('estimator',
-                                                                               'super',
-                                                                               'insurance_company',
-                                                                               'adjuster',
-                                                                               'status',
-                                                                               'loss_type',
-                                                                               'program_type',
-                                                                               'referral_type')
-            table['jobs'] = jobs_of_the_day
-            table.update(jobs_of_the_day.aggregate(count=models.Count('pk'),
-                                                   sum=models.Sum('estimated_loss'),
-                                                   avg=models.Avg('estimated_loss'),
-                                                   min=models.Min('estimated_loss'),
-                                                   max=models.Max('estimated_loss')))
-            if not show_empty and table['count'] == 0:
-                continue
+def get_jobs_stat(groups, stat):
+    vals = []
+    count = 0
+    if isinstance(groups[0], Job):
+        for job in groups:
+            count += 1
+            if job.estimated_loss is not None:
+                vals.append(job.estimated_loss)
+    else:
+        for group in groups:
+            for job in group['jobs']:
+                count += 1
+                if job.estimated_loss is not None:
+                    vals.append(job.estimated_loss)
+    if len(vals) < 1 and stat is not 'count':
+        return None
+    if stat == 'avg':
+        return mean(vals)
+    if stat == 'max':
+        return amax(vals)
+    if stat == 'min':
+        return amin(vals)
+    if stat == 'sum':
+        return sum(vals)
+    if stat == 'count':
+        return count
+
+def get_job_attr(job, obj_name):
+    if obj_name == 'entry_date':
+        return job.entry_date.strftime("%b %d, %Y")
+    else:
+        return getattr(job, obj_name)
+
+def group_jobs(jobs, group_by):
+    groups = {}
+    obj_name = get_object_name(group_by)
+
+    for job in jobs:
+        if get_job_attr(job, obj_name) not in groups:
+            groups[get_job_attr(job, obj_name)] = [job]
+        else:
+            groups[get_job_attr(job, obj_name)].append(job)
+
+    return groups
+
+def sort_jobs(jobs, sort_by):
+    sorted_groups = {}
+    obj_name = get_object_name(sort_by)
+
+    for k, v in jobs.iteritems():
+        if k not in sorted_groups:
+            sorted_groups[k] = {}
+        for job in v:
+            if get_job_attr(job, obj_name) not in sorted_groups[k]:
+                sorted_groups[k][get_job_attr(job, obj_name)] = [job]
             else:
-                tables.append(table)
-        # outer loop
-        total_jobs = Job.objects.filter(entry_date__gt=start_datetime,
-                                        entry_date__lt=end_datetime,
-                                        status__in=statuses).aggregate(count=models.Count('pk'),
-                                                                               sum=models.Sum('estimated_loss'),
-                                                                               avg=models.Avg('estimated_loss'),
-                                                                               min=models.Min('estimated_loss'),
-                                                                               max=models.Max('estimated_loss'))
-        section = {'title': start_datetime.strftime("%b %d, %Y"), 'tables': tables}
-        section.update(total_jobs)
-        if not show_empty and section['count'] == 0:
-            continue
-        sections.append(section)
-    return render(request, "job_list.html", {'sections': sections,
-                                             'start': start,
-                                             'end': end,
-                                             'obj_type': 'Date',
-                                             'show_most_recent_note': show_most_recent_note})
+                sorted_groups[k][get_job_attr(job, obj_name)].append(job)
+    return sorted_groups
 
+def get_jobs(group_by, sort_by, start, end, statuses, show_empty=False):
+    jobs = Job.objects.filter(
+        entry_date__gt=start,
+        entry_date__lt=end,
+        status__in=statuses).select_related(
+            'estimator',
+            'super',
+            'insurance_company',
+            'adjuster',
+            'status',
+            'loss_type',
+            'program_type',
+            'referral_type'
+        )
+    job_groups = group_jobs(jobs, group_by)
+    job_groups = sort_jobs(job_groups, sort_by)
+    if not show_empty:
+        job_groups.pop(None, None)
+        for k, v in job_groups.iteritems():
+            v.pop(None, None)
+    return job_groups
 
-def by_fk(request, start, end, show_empty, show_most_recent_note, statuses, obj_type, type_name_field, job_field):
-    job_list = Job.objects.filter(entry_date__gt=start,
-                                  entry_date__lt=end,
-                                  status__in=statuses).select_related('estimator',
-                                                                      'super',
-                                                                      'insurance_company',
-                                                                      'adjuster',
-                                                                      'status',
-                                                                      'loss_type',
-                                                                      'program_type',
-                                                                      'referral_type')
-    if show_empty:
-        objects = obj_type.objects.all()
+def sort_jobs_for_template(jobs, group_by_date, sort_by_date):
+    sorted_jobs = []
+    if group_by_date:
+        sorted_keys = sorted(
+            jobs, key=lambda x: datetime.strptime(x, "%b %d, %Y")
+        )
     else:
-        objects = obj_type.objects.filter(job__id__in=job_list).distinct()
-    type_name = obj_type._meta.verbose_name.title()
-    sections = []
-    for obj in objects:
-        tables = []
-        for status in statuses:
-            table = {'status': status}
-            filter_kwargs = {job_field: obj, 'status': status}
-            jobs = job_list.filter(**filter_kwargs)
-            table['jobs'] = jobs
-            table.update(jobs.aggregate(count=models.Count('pk'),
-                                        sum=models.Sum('estimated_loss'),
-                                        avg=models.Avg('estimated_loss'),
-                                        min=models.Min('estimated_loss'),
-                                        max=models.Max('estimated_loss')))
-            if not show_empty and table['count'] == 0:
-                continue
-            tables.append(table)
-        filter_kwargs = {job_field: obj, 'status__in': statuses}
-        total_jobs = job_list.filter(**filter_kwargs).aggregate(count=models.Count('pk'),
-                                                                sum=models.Sum('estimated_loss'),
-                                                                avg=models.Avg('estimated_loss'),
-                                                                min=models.Min('estimated_loss'),
-                                                                max=models.Max('estimated_loss'))
-        section = {'title': getattr(obj, type_name_field), 'tables': tables}
-        section.update(total_jobs)
-        if not show_empty and section['count'] == 0:
-            continue
-        sections.append(section)
-
-    return render(request, "job_list.html", {'job_list': job_list,
-                                             'sections': sections,
-                                             'start': start,
-                                             'end': end,
-                                             'obj_type': type_name,
-                                             'show_most_recent_note': show_most_recent_note})
-
-def by_user_group(request, start, end, show_empty, show_most_recent_note, statuses, group_name, job_field, related_name):
-    job_list = Job.objects.filter(entry_date__gt=start,
-                                  entry_date__lt=end,
-                                  status__in=statuses).select_related('estimator',
-                                                                      'super',
-                                                                      'insurance_company',
-                                                                      'adjuster',
-                                                                      'status',
-                                                                      'loss_type',
-                                                                      'program_type',
-                                                                      'referral_type',
-                                                                      'most_recent_note')
-    if show_empty:
-        objects = User.objects.filter(groups__name=group_name, is_active=True)
-    else:
-        keyword = related_name + "__id__in"
-        filter_kwargs = {keyword: job_list, 'groups__name': group_name, 'is_active': True}
-        objects = User.objects.filter(**filter_kwargs).distinct()
-    sections = []
-    for obj in objects:
-        tables = []
-        for status in statuses:
-            table = {'title': obj.first_name + ' ' + obj.last_name,
-                     'status': status}
-            filter_kwargs = {job_field: obj, 'status': status}
-            jobs = job_list.filter(**filter_kwargs)
-            table['jobs'] = jobs
-            table.update(jobs.aggregate(count=models.Count('pk'),
-                                        sum=models.Sum('estimated_loss'),
-                                        avg=models.Avg('estimated_loss'),
-                                        min=models.Min('estimated_loss'),
-                                        max=models.Max('estimated_loss')))
-            if not show_empty and table['count'] == 0:
-                continue
-            tables.append(table)
-        # outer loop
-        filter_kwargs = {job_field: obj, 'status__in': statuses}
-        total_jobs = job_list.filter(**filter_kwargs).aggregate(count=models.Count('pk'),
-                                                                sum=models.Sum('estimated_loss'),
-                                                                avg=models.Avg('estimated_loss'),
-                                                                min=models.Min('estimated_loss'),
-                                                                max=models.Max('estimated_loss'))
-        section = {'title': obj.first_name + ' ' + obj.last_name, 'tables': tables}
-        section.update(total_jobs)
-        if not show_empty and section['count'] == 0:
-            continue
-        sections.append(section)
-    return render(request, "job_list.html", {'job_list': job_list,
-                                             'sections': sections,
-                                             'start': start,
-                                             'end': end,
-                                             'obj_type': group_name,
-                                             'show_most_recent_note': show_most_recent_note})
-
+        sorted_keys = sorted(jobs)
+    for k in sorted_keys:
+        new_group = []
+        if sort_by_date:
+            sorted_sub_keys = sorted(
+                jobs[k], key=lambda x: datetime.strptime(x, "%b %d, %Y")
+            )
+        else:
+            sorted_sub_keys = sorted(jobs[k])
+        for kk in sorted_sub_keys:
+            new_group.append({
+                'job_count': get_jobs_stat(jobs[k][kk], 'count'),
+                'avg': get_jobs_stat(jobs[k][kk], 'avg'),
+                'sum': get_jobs_stat(jobs[k][kk], 'sum'),
+                'max': get_jobs_stat(jobs[k][kk], 'max'),
+                'min': get_jobs_stat(jobs[k][kk], 'min'),
+                'name': kk,
+                'jobs': jobs[k][kk]
+            })
+        sorted_jobs.append({
+            'job_count': get_jobs_stat(new_group, 'count'),
+            'avg': get_jobs_stat(new_group, 'avg'),
+            'sum': get_jobs_stat(new_group, 'sum'),
+            'max': get_jobs_stat(new_group, 'max'),
+            'min': get_jobs_stat(new_group, 'min'),
+            'name': k,
+            'jobs': new_group
+        })
+    return sorted_jobs
 
 @login_required()
 def reports(request):
@@ -211,34 +181,27 @@ def reports(request):
                 end = now
             show_most_recent_note = form.cleaned_data['most_recent_note']
             group_by = form.cleaned_data['group_by']
-            # sort_by = form.cleaned_data['sort_by']
+            sort_by = form.cleaned_data['sort_by']
             show_empty = form.cleaned_data['show_empty']
             if form.cleaned_data['show_all_statuses']:
                 statuses = JobStatus.objects.all()
             else:
                 statuses = form.cleaned_data['statuses']
                 statuses = JobStatus.objects.filter(status__in=statuses)
-            objects = 0
-            if group_by == 'Adjuster':
-                return by_fk(request, start, end, show_empty, show_most_recent_note, statuses, Adjuster, 'name', 'adjuster')
-            elif group_by == 'Entry Date':
-                return by_entry_date(request, start, end, show_empty, show_most_recent_note, statuses)
-            elif group_by == 'Estimator':
-                return by_user_group(request, start, end, show_empty, show_most_recent_note, statuses, 'Estimators', 'estimator', 'job_estimator')
-            elif group_by == 'Superintendent':
-                return by_user_group(request, start, end, show_empty, show_most_recent_note, statuses, 'Superintendents', 'super', 'job_super')
-            elif group_by == 'InsuranceCo':
-                return by_fk(request, start, end, show_empty, show_most_recent_note, statuses, Insurance, 'name', 'insurance_company')
-            elif group_by == 'LossType':
-                return by_fk(request, start, end, show_empty, show_most_recent_note, statuses, LossType, 'loss_type', 'loss_type')
-            elif group_by == 'Program':
-                return by_fk(request, start, end, show_empty, show_most_recent_note, statuses, ProgramType, 'type', 'program_type')
-            elif group_by == 'Referral':
-                return by_fk(request, start, end, show_empty, show_most_recent_note, statuses, ReferralType, 'referral_type', 'referral_type')
-            elif group_by == 'Status':
-                return by_fk(request, start, end, show_empty, show_most_recent_note, statuses, JobStatus, 'status', 'status')
-            else:
-                raise ValueError('Unexpected input from cleaned form')
+
+            try:
+                jobs = get_jobs(group_by, sort_by, start, end, statuses, show_empty)
+            except Exception, e:
+                raise ValueError('There was a problem generating this report. Please try again or contact support.')
+
+            return render(request, "job_list.html", {
+                'job_groups': sort_jobs_for_template(jobs, group_by=='Entry Date', sort_by=='Entry Date'),
+                'start': start,
+                'end': end,
+                'group_by': group_by,
+                'sort_by': sort_by,
+                'show_most_recent_note': show_most_recent_note
+            })
     else:
         return render(request, "report.html", {'form': Report()})
 
@@ -352,3 +315,11 @@ def print_job(request, job_id):
 def print_job_with_notes(request, job_id, print_notes=True):
     job = Job.objects.get(pk=job_id)
     return render(request, "print_job.html", {'job': job, 'show_notes': print_notes})
+
+@login_required()
+def get_job_number(request):
+    # Get the last Job with a job number and increment one for new job number
+    # NOTE: This isn't ideal - job_number should *always* be set by the database
+    # and auto-incremented
+    job = Job.objects.exclude(job_number__isnull=True).order_by('-job_number')[0]
+    return JsonResponse({'job_number': job.job_number + 1})
