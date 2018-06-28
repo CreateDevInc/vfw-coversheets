@@ -104,7 +104,7 @@ class Job(models.Model):
     referred_by = models.CharField(max_length=255, blank=True, null=True)
 
     #Customer and contact info
-    customer = models.CharField(max_length=255, blank=True)
+    customer = models.CharField(max_length=255, blank=True, null=True)
     customer_email = models.EmailField(blank=True, null=True)
     contact_info_1 = PhoneNumberField(blank=True, null=True)
     contact_info_1_ext = models.CharField(max_length=64, blank=True, null=True)
