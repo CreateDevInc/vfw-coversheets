@@ -29,7 +29,7 @@
         </span>
     </div>
     <div class="container">
-        <h1>Group By {{ group_by }}, Subgroup By {{ sort_by }}</h1>
+        <h1>Warranty List</h1>
         <h2>{{ start }} - {{ end }}</h2>
         {% for group in job_groups %}
           <h3>{{ group_by}}: {{group.name}}</h3>
@@ -39,54 +39,36 @@
               <thead>
                   <tr>
                       <th class="col-md-2"> Customer </th>
-                      <th class="col-md-1"> Address </th>
                       <th class="col-md-1"> City </th>
                       <th class="col-md-1"> Date </th>
-                      <th class="col-md-1"> Program</th>
-                      <th class="col-md-1"> Loss Type</th>
-                      <th class="col-md-1"> Status</th>
-                      <th class="col-md-1"> Insurance</th>
                       <th class="col-md-1"> Estimator</th>
-                      <th class="col-md-1"> Superintendent</th>
-                      <th class="col-md-1"> Adjuster</th>
                       <th class="col-md-1"> Production</th>
+                      <th class="col-md-1"> Insurance</th>
+                      <th class="col-md-1"> Loss Type</th>
                       <th class="col-md-1"> Value</th>
-                      <th class="col-md-1"> Percent Complete</th>
-                      <th class="col-md-1"> Referral Type</th>
-                      <th class="col-md-1"> Pending Items</th>
+                      <th class="col-md-1"> Program</th>
                   </tr>
               </thead>
               <tbody>
                 {% for job in subgroup.jobs %}
                   <tr>
                       <td class="col-md-2"> {{ job.customer }}</td>
-                      <td class="col-md-1"> {{ job.customer_address }}</td>
                       <td class="col-md-1"> {{ job.city }}</td>
                       <td class="col-md-1"> {{ job.entry_date | date:"m/d/y" }}</td>
-                      <td class="col-md-1"> {{ job.program_type }}</td>
-                      <td class="col-md-1"> {{ job.loss_type }}</td>
-                      <td class="col-md-1"> {{ job.status }}</td>
-                      <td class="col-md-1"> {{ job.insurance_company }}</td>
                       {% if job.estimator %}
                         <td class="col-md-1"> {{ job.estimator.first_name }} {{ job.estimator.last_name }}</td>
                       {% else %}
                         <td class="col-md-1"></td>
                       {% endif %}
-                      {% if job.super %}
-                        <td class="col-md-1"> {{ job.super.first_name }} {{ job.super.last_name }}</td>
-                      {% else %}
-                        <td class="col-md-1"></td>
-                      {% endif %}
-                      <td class="col-md-1"> {{ job.adjuster }} </td>
                       {% if job.production_manager %}
                         <td class="col-md-1"> {{ job.production_manager.first_name }} {{ job.production_manager.last_name }}</td>
                       {% else %}
                         <td class="col-md-1"></td>
                       {% endif %}
+                      <td class="col-md-1"> {{ job.insurance_company }}</td>
+                      <td class="col-md-1"> {{ job.loss_type }}</td>
                       <td class="col-md-1"> $ {{ job.estimated_loss | floatformat:2 | intcomma}} </td>
-                      <td class="col-md-1"> {{ job.percent_complete }} </td>
-                      <td class="col-md-1"> {{ job.referral_type }} </td>
-                      <td class="col-md-1"> {{ job.pending_items }} </td>
+                      <td class="col-md-1"> {{ job.program_type }}</td>
                   </tr>
                   {% if show_most_recent_note %}
                     <tr>

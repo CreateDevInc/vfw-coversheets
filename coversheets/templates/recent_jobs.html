@@ -2,8 +2,21 @@
 <ul style="padding: 10px;">
 
 {% for l in log %}
+  {% if l.user == current_user %}
   <p class="log-entry">
-    {{ l }}
+      {% if l.action_flag == 1 %}
+        Added
+      {% endif %}
+      {% if l.action_flag == 2 %}
+        Changed
+      {% endif %}
+      {% if l.action_flag == 3 %}
+        Deleted
+      {% endif %}
+    <a href="{{l.get_admin_url}}">
+      {{ l.get_edited_object}}
+    </a>
   </p>
+  {% endif %}
 {% endfor %}
 </ul>

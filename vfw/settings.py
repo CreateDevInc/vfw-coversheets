@@ -170,9 +170,9 @@ SUIT_CONFIG = {
         {'label': 'New Coversheet', 'url': '/admin/coversheets/job/add/', 'icon': 'icon-plus'},
         {'app': 'auth', 'label': 'Users'},
         {'label': 'Reports', 'url': '/coversheets/reports'},
-        {'label': 'Weekly Production List'},
-        {'label': 'Estimator Snapshot'},
-        {'label': 'Warranty List'},
+        {'label': 'Weekly Production List', 'url': '/coversheets/weekly-production'},
+        {'label': 'Estimator Snapshot', 'url': '/coversheets/estimator-snapshot'},
+        {'label': 'Warranty List', 'url': '/coversheets/warranty-list'},
     )
 }
 TIME_ZONE = 'America/Phoenix'

@@ -17,13 +17,13 @@ from numpy import mean, amax, amin, sum
 
 
 def home(request):
-    return HttpResponse("Hello world")
+    return HttpResponse('Hello world')
 
 @login_required()
 def show_album(request, album):
     context = {}
     context['images'] = Image.objects.filter(album=album)
-    return render(request, "show_album.html", context)
+    return render(request, 'show_album.html', context)
 
 @login_required()
 def add_album(request):
@@ -31,15 +31,16 @@ def add_album(request):
         form = AlbumUpload(request.POST, files=request.FILES)
         if form.is_valid():
             form.save()
-        return render(request, "multi_upload_template.html", {'form': form})
+        return render(request, 'multi_upload_template.html', {'form': form})
     else:
-        return render(request, "multi_upload_template.html", {'form': AlbumUpload()})
+        return render(request, 'multi_upload_template.html', {'form': AlbumUpload()})
 
 def get_object_name(name):
     names = {
         'InsuranceCo': 'insurance_company',
         'Adjuster': 'adjuster',
         'Estimator': 'estimator',
+        'Production Manager': 'production_manager',
         'Superintendent': 'super',
         'LossType': 'loss_type',
         'Program': 'program_type',
@@ -52,7 +53,7 @@ def get_object_name(name):
 def get_jobs_stat(groups, stat):
     vals = []
     count = 0
-    if isinstance(groups[0], Job):
+    if len(groups) > 0 and isinstance(groups[0], Job):
         for job in groups:
             count += 1
             if job.estimated_loss is not None:
@@ -78,7 +79,7 @@ def get_jobs_stat(groups, stat):
 
 def get_job_attr(job, obj_name):
     if obj_name == 'entry_date':
-        return job.entry_date.strftime("%b %d, %Y")
+        return job.entry_date.strftime('%b %d, %Y')
     else:
         return getattr(job, obj_name)
 
@@ -115,6 +116,7 @@ def get_jobs(group_by, sort_by, start, end, statuses, show_empty=False):
         status__in=statuses).select_related(
             'estimator',
             'super',
+            'production_manager',
             'insurance_company',
             'adjuster',
             'status',
@@ -134,7 +136,7 @@ def sort_jobs_for_template(jobs, group_by_date, sort_by_date):
     sorted_jobs = []
     if group_by_date:
         sorted_keys = sorted(
-            jobs, key=lambda x: datetime.strptime(x, "%b %d, %Y")
+            jobs, key=lambda x: datetime.strptime(x, '%b %d, %Y')
         )
     else:
         sorted_keys = sorted(jobs)
@@ -142,7 +144,7 @@ def sort_jobs_for_template(jobs, group_by_date, sort_by_date):
         new_group = []
         if sort_by_date:
             sorted_sub_keys = sorted(
-                jobs[k], key=lambda x: datetime.strptime(x, "%b %d, %Y")
+                jobs[k], key=lambda x: datetime.strptime(x, '%b %d, %Y')
             )
         else:
             sorted_sub_keys = sorted(jobs[k])
@@ -166,6 +168,86 @@ def sort_jobs_for_template(jobs, group_by_date, sort_by_date):
             'jobs': new_group
         })
     return sorted_jobs
+
+@login_required()
+def weekly_production(request):
+    now = datetime.now()
+    start = now - timedelta(days=7)
+    end = now
+    show_most_recent_note = False
+    group_by = 'Production Manager'
+    sort_by = 'Estimator'
+    show_empty = True
+    statuses = JobStatus.objects.all()
+    jobs = get_jobs(group_by, sort_by, start, end, statuses, show_empty)
+
+    try:
+        jobs = get_jobs(group_by, sort_by, start, end, statuses, show_empty)
+    except Exception, e:
+        raise ValueError('There was a problem generating this report. Please try again or contact support.')
+
+    return render(request, 'weekly_production.html', {
+        'job_groups': sort_jobs_for_template(jobs, False, False),
+        'start': start,
+        'end': end,
+        'group_by': group_by,
+        'sort_by': sort_by,
+        'show_most_recent_note': show_most_recent_note
+    })
+
+@login_required()
+def estimator_snapshot(request):
+    now = datetime.now()
+    start = now - timedelta(days=365)
+    end = now
+    show_most_recent_note = False
+    group_by = 'Estimator'
+    sort_by = 'InsuranceCo'
+    show_empty = False
+    statuses = JobStatus.objects.filter(status__in=[
+        'Assigned', 'Emergency', 'Pending', 'Signed'
+    ])
+    jobs = get_jobs(group_by, sort_by, start, end, statuses, show_empty)
+
+    try:
+        jobs = get_jobs(group_by, sort_by, start, end, statuses, show_empty)
+    except Exception, e:
+        raise ValueError('There was a problem generating this report. Please try again or contact support.')
+
+    return render(request, 'estimator_snapshot.html', {
+        'job_groups': sort_jobs_for_template(jobs, False, False),
+        'start': start,
+        'end': end,
+        'group_by': group_by,
+        'sort_by': sort_by,
+        'show_most_recent_note': show_most_recent_note
+    })
+
+@login_required()
+def warranty_list(request):
+    now = datetime.now()
+    start = now - timedelta(days=365)
+    end = now
+    show_most_recent_note = False
+    group_by = 'Production Manager'
+    sort_by = 'Entry Date'
+    show_empty = True
+    statuses = JobStatus.objects.filter(status__in=['Warranty'])
+    jobs = get_jobs(group_by, sort_by, start, end, statuses, show_empty)
+
+    try:
+        jobs = get_jobs(group_by, sort_by, start, end, statuses, show_empty)
+    except Exception, e:
+        raise ValueError('There was a problem generating this report. Please try again or contact support.')
+
+    return render(request, 'warranty_list.html', {
+        'job_groups': sort_jobs_for_template(jobs, False, True),
+        'start': start,
+        'end': end,
+        'group_by': group_by,
+        'sort_by': sort_by,
+        'show_most_recent_note': show_most_recent_note
+    })
 
 @login_required()
 def reports(request):
@@ -194,8 +276,12 @@ def reports(request):
             except Exception, e:
                 raise ValueError('There was a problem generating this report. Please try again or contact support.')
 
-            return render(request, "job_list.html", {
-                'job_groups': sort_jobs_for_template(jobs, group_by=='Entry Date', sort_by=='Entry Date'),
+            return render(request, 'job_list.html', {
+                'job_groups': sort_jobs_for_template(
+                    jobs,
+                    group_by=='Entry Date',
+                    sort_by=='Entry Date'
+                ),
                 'start': start,
                 'end': end,
                 'group_by': group_by,
@@ -203,7 +289,7 @@ def reports(request):
                 'show_most_recent_note': show_most_recent_note
             })
     else:
-        return render(request, "report.html", {'form': Report()})
+        return render(request, 'report.html', {'form': Report()})
 
 
 @login_required()

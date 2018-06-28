@@ -96,23 +96,23 @@ class Job(models.Model):
 
     #Call info
 
-    program_type = models.ForeignKey(ProgramType, blank=True)
+    program_type = models.ForeignKey(ProgramType, blank=True, null=True)
     called_in_by = models.CharField(max_length=200, blank=True)
-    loss_type = models.ForeignKey(LossType, blank=True)
+    loss_type = models.ForeignKey(LossType, blank=True, null=True)
     estimated_loss = models.DecimalField(max_digits=15, decimal_places=2, null=True, blank=True)
     referral_type = models.ForeignKey(ReferralType, null=True, blank=True)
-    referred_by = models.CharField(max_length=255, blank=True)
+    referred_by = models.CharField(max_length=255, blank=True, null=True)
 
     #Customer and contact info
     customer = models.CharField(max_length=255, blank=True)
-    customer_email = models.EmailField(blank=True)
+    customer_email = models.EmailField(blank=True, null=True)
     contact_info_1 = PhoneNumberField(blank=True, null=True)
-    contact_info_1_ext = models.CharField(max_length=64, blank=True)
+    contact_info_1_ext = models.CharField(max_length=64, blank=True, null=True)
     contact_info_1.verbose_name = 'Best Contact Phone'
     contact_info_1_ext.verbose_name = 'ext.'
 
     contact_info_2 = PhoneNumberField(blank=True, null=True)
-    contact_info_2_ext = models.CharField(max_length=64, blank=True)
+    contact_info_2_ext = models.CharField(max_length=64, blank=True, null=True)
     contact_info_2.verbose_name = 'Addtional Contact Phone'
     contact_info_2_ext.verbose_name = 'ext.'
 
@@ -120,11 +120,11 @@ class Job(models.Model):
     contact_email = models.EmailField(blank=True)
 
     primary_phone = PhoneNumberField(blank=True)
-    primary_phone_ext = models.CharField(max_length=64, blank=True)
+    primary_phone_ext = models.CharField(max_length=64, blank=True, null=True)
     primary_phone_ext.verbose_name = 'ext.'
 
-    mobile_phone = PhoneNumberField(blank=True)
-    mobile_phone_ext = models.CharField(max_length=64, blank=True)
+    mobile_phone = PhoneNumberField(blank=True, null=True)
+    mobile_phone_ext = models.CharField(max_length=64, blank=True, null=True)
     mobile_phone_ext.verbose_name = 'ext.'
 
     customer_address = models.CharField(max_length=128, blank=True, null=True)
@@ -132,11 +132,11 @@ class Job(models.Model):
     city = models.ForeignKey(City, related_name="job_city_customer", blank=True, null=True)
     zip = models.CharField(max_length=10, blank=True, null=True)
 
-    loss_address = models.CharField(max_length=128, blank=True)
-    loss_city = models.ForeignKey(City, related_name="job_city_loss", blank=True)
-    loss_zip = models.CharField(max_length=10, blank=True)
-    loss_year_built = models.DateField(null=True, blank=True)
-    loss_information = models.TextField(max_length=4000, blank=True)
+    loss_address = models.CharField(max_length=128, blank=True, null=True)
+    loss_city = models.ForeignKey(City, related_name="job_city_loss", blank=True, null=True)
+    loss_zip = models.CharField(max_length=10, blank=True, null=True)
+    loss_year_built = models.DateField(blank=True, null=True)
+    loss_information = models.TextField(max_length=4000, blank=True, null=True)
 
     # insurance information
     adjuster = models.ForeignKey('Adjuster', null=True, blank=True)
@@ -144,14 +144,14 @@ class Job(models.Model):
     insurance_company = models.ForeignKey("Insurance", null=True, blank=True)
 
     claim_date = models.DateField(blank=True, null=True)
-    claim_number = models.CharField(max_length=255, blank=True)
+    claim_number = models.CharField(max_length=255, blank=True, null=True)
     deductible = models.DecimalField(max_digits=16, decimal_places=2, null=True, blank=True)
     deductible_collected = models.BooleanField(default=False, null=False, blank=True)
-    policy_number = models.CharField(max_length=255, blank=True)
+    policy_number = models.CharField(max_length=255, blank=True, null=True)
 
     emergency_requested = models.BooleanField(default=False, null=False, blank=True)
-    emergency_dispatch = models.CharField(max_length=255, blank=True)  # Strange field that can be used for user names, company names, or a description of what happened for the emergency.
-    additional_info = models.TextField(max_length=4000, blank=True)
+    emergency_dispatch = models.CharField(max_length=255, blank=True, null=True)  # Strange field that can be used for user names, company names, or a description of what happened for the emergency.
+    additional_info = models.TextField(max_length=4000, blank=True, null=True)
 
     @property
     def deductable_d(self):
