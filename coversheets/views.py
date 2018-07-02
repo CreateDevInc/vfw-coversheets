@@ -172,13 +172,13 @@ def sort_jobs_for_template(jobs, group_by_date, sort_by_date):
 @login_required()
 def weekly_production(request):
     now = datetime.now()
-    start = now - timedelta(days=7)
+    start = now - timedelta(days=365)
     end = now
     show_most_recent_note = False
     group_by = 'Production Manager'
     sort_by = 'Estimator'
     show_empty = True
-    statuses = JobStatus.objects.all()
+    statuses = JobStatus.objects.filter(status__in=['Production'])
     jobs = get_jobs(group_by, sort_by, start, end, statuses, show_empty)
 
     try:
@@ -202,7 +202,7 @@ def estimator_snapshot(request):
     end = now
     show_most_recent_note = False
     group_by = 'Estimator'
-    sort_by = 'InsuranceCo'
+    sort_by = 'Status'
     show_empty = False
     statuses = JobStatus.objects.filter(status__in=[
         'Assigned', 'Emergency', 'Pending', 'Signed'

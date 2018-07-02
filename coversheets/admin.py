@@ -403,13 +403,8 @@ class JobAdmin(RelatedWidgetWrapperBase, VersionAdmin):
         'job_number',
         'program_type__type',
         'called_in_by',
-        'loss_type__type',
         'estimated_loss',
-        'referral_type__type',
         'referred_by',
-        'estimator',
-        'super',
-        'production_manager',
     ]
 
 
@@ -430,10 +425,12 @@ class JobAdmin(RelatedWidgetWrapperBase, VersionAdmin):
         'adjuster_mobile',
         'adjuster_fax',
         'adjuster_email',
+        'adjuster_type',
         'ind_adjuster_phone',
         'ind_adjuster_mobile',
         'ind_adjuster_fax',
         'ind_adjuster_email',
+        'ind_adjuster_type',
         'job_number_or_empty_string',
         'map'
     )
@@ -459,12 +456,15 @@ class JobAdmin(RelatedWidgetWrapperBase, VersionAdmin):
 
         ('Loss Location', {
             'classes': ('suit-tab suit-tab-job_info',),
-            'fields': ('loss_address', 'loss_city', 'loss_zip', 'loss_information', 'loss_year_built', 'map'),
-        }),
-
-        ('', {
-            'classes': ('suit-tab suit-tab-job_info',),
-            'fields':  ('additional_info',),
+            'fields': (
+                'loss_address',
+                'loss_city',
+                'loss_zip',
+                'loss_information',
+                'loss_year_built',
+                'additional_info',
+                'map'
+            ),
         }),
 
         ('Insurance', {
@@ -476,6 +476,7 @@ class JobAdmin(RelatedWidgetWrapperBase, VersionAdmin):
                 ('adjuster_phone', 'ind_adjuster_phone'),
                 ('adjuster_mobile', 'ind_adjuster_mobile'),
                 ('adjuster_fax', 'ind_adjuster_fax'),
+                ('adjuster_type', 'ind_adjuster_type'),
                 'claim_date',
                 'claim_number',
                 'policy_number',
@@ -545,6 +546,18 @@ class JobAdmin(RelatedWidgetWrapperBase, VersionAdmin):
     def adjuster_phone(self, obj):
         if obj.adjuster is not None:
             return obj.adjuster.full_phone()
+        else:
+            return ''
+
+    def adjuster_type(self, obj):
+        if obj.adjuster is not None:
+            return obj.adjuster.adjuster_type
+        else:
+            return ''
+
+    def ind_adjuster_type(self, obj):
+        if obj.independent_adjuster is not None:
+            return obj.independent_adjuster.adjuster_type
         else:
             return ''
 

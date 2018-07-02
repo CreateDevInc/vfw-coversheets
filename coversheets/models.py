@@ -121,10 +121,12 @@ class Job(models.Model):
 
     primary_phone = PhoneNumberField(blank=True)
     primary_phone_ext = models.CharField(max_length=64, blank=True, null=True)
+    primary_phone.verbose_name = 'Best Contact Phone'
     primary_phone_ext.verbose_name = 'ext.'
 
     mobile_phone = PhoneNumberField(blank=True, null=True)
     mobile_phone_ext = models.CharField(max_length=64, blank=True, null=True)
+    mobile_phone.verbose_name = 'Additional Contact Phone'
     mobile_phone_ext.verbose_name = 'ext.'
 
     customer_address = models.CharField(max_length=128, blank=True, null=True)
