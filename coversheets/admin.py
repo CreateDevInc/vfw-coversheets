@@ -470,7 +470,7 @@ class JobAdmin(RelatedWidgetWrapperBase, VersionAdmin):
         ('Insurance', {
             'classes': ('suit-tab suit-tab-job_info',),
             'fields': (
-                'insurance_company',
+                ('insurance_company', 'ind_insurance_company'),
                 ('adjuster', 'independent_adjuster'),
                 ('adjuster_email', 'ind_adjuster_email'),
                 ('adjuster_phone', 'ind_adjuster_phone'),
@@ -667,9 +667,7 @@ class JobAdmin(RelatedWidgetWrapperBase, VersionAdmin):
         :param change:
         :return:
         """
-        if obj.city == '' or obj.customer_address == '' or obj.zip == '':
-            # The only way that this can be blank is if the "same as loss address" box was checked, so copy the
-            # information from loss address into the contact address.
+        if form.cleaned_data['same_as_loss_address']:
             obj.city = obj.loss_city
             obj.customer_address = obj.loss_address
             obj.zip = obj.loss_zip

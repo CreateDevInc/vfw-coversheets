@@ -144,6 +144,7 @@ class Job(models.Model):
     adjuster = models.ForeignKey('Adjuster', null=True, blank=True)
     independent_adjuster = models.ForeignKey('Adjuster', null=True, blank=True, related_name='independent_adjuster')
     insurance_company = models.ForeignKey("Insurance", null=True, blank=True)
+    ind_insurance_company = models.ForeignKey("Insurance", null=True, blank=True, related_name='ind_insurance_company')
 
     claim_date = models.DateField(blank=True, null=True)
     claim_number = models.CharField(max_length=255, blank=True, null=True)
