@@ -55,11 +55,11 @@
                       <th class="col-md-1"> City </th>
                       <th class="col-md-1"> Date </th>
                       <th class="col-md-1"> Insurance </th>
+                      <th class="col-md-1"> Adjuster </th>
                       <th class="col-md-1"> Loss Type </th>
                       <th class="col-md-1"> Value </th>
                       <th class="col-md-1"> Program </th>
                       <th class="col-md-1"> Referral Type</th>
-                      <th class="col-md-1"> Estimator</th>
                   </tr>
               </thead>
               <tbody>
@@ -69,15 +69,15 @@
                       <td class="col-md-1"> {{ job.city }}</td>
                       <td class="col-md-1"> {{ job.entry_date | date:"m/d/y" }}</td>
                       <td class="col-md-1"> {{ job.insurance_company }}</td>
+                      {% if job.adjuster %}
+                        <td class="col-md-1"> {{ job.adjuster.first_name }} {{ job.adjuster.last_name }}</td>
+                      {% else %}
+                        <td class="col-md-1"></td>
+                      {% endif %}
                       <td class="col-md-1"> {{ job.loss_type }}</td>
                       <td class="col-md-1"> $ {{ job.estimated_loss | floatformat:2 | intcomma}} </td>
                       <td class="col-md-1"> {{ job.program_type }}</td>
                       <td class="col-md-1"> {{ job.referral_type }} </td>
-                      {% if job.estimator %}
-                        <td class="col-md-1"> {{ job.estimator.first_name }} {{ job.estimator.last_name }}</td>
-                      {% else %}
-                        <td class="col-md-1"></td>
-                      {% endif %}
                   </tr>
                   {% if show_most_recent_note %}
                     <tr>

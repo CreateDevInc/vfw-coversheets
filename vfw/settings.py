@@ -93,9 +93,10 @@ DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql_psycopg2',
         'NAME': 'vfw',
-        'USER': 'kyle',
+        'USER': 'coversheets',
+        'PASSWORD': 'password',
         'HOST': 'localhost',
-        'PORT': ''
+        'PORT': '5433',
     }
 }
 
@@ -170,9 +171,9 @@ SUIT_CONFIG = {
         {'label': 'New Coversheet', 'url': '/admin/coversheets/job/add/', 'icon': 'icon-plus'},
         {'app': 'auth', 'label': 'Users'},
         {'label': 'Reports', 'url': '/coversheets/reports'},
-        {'label': 'Weekly Production List', 'url': '/coversheets/weekly-production'},
-        {'label': 'Estimator Snapshot', 'url': '/coversheets/estimator-snapshot'},
-        {'label': 'Warranty List', 'url': '/coversheets/warranty-list'},
+        {'label': 'Weekly Production List', 'url': '/coversheets/weekly-production', 'blank': True},
+        {'label': 'Estimator Snapshot', 'url': '/coversheets/estimator-snapshot', 'blank': True},
+        {'label': 'Warranty List', 'url': '/coversheets/warranty-list', 'blank': True},
     )
 }
 TIME_ZONE = 'America/Phoenix'

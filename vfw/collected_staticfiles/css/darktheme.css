@@ -8,3 +8,7 @@
 .table-striped>tbody>tr:nth-child(even)>th {
    background-color: #e5e5e5;
  }
+
+ .form-horizontal .control-group .field-box .controls .multi-field-box {
+     min-width: 250px !important;
+ }

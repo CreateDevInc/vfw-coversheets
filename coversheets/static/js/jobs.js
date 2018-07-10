@@ -23,6 +23,23 @@
     }
   }
 
+  function initLinks() {
+    const albumUrl = $('#id_album_link').val();
+    const budgetUrl = $('#id_budget_link').val();
+    const scheduleUrl = $('#id_schedule_link').val();
+
+    if (albumUrl) {
+      $('.field-album_link .controls').append('<a style="margin-left: 5px;" href="' + $('#id_album_link').val() + '">Go To URL</a>');
+    }
+    if (budgetUrl) {
+      $('.field-budget_link .controls').append('<a style="margin-left: 5px;" href="' + $('#id_budget_link').val() + '">Go To URL</a>');
+    }
+    if (scheduleUrl) {
+      $('.field-schedule_link .controls').append('<a style="margin-left: 5px;" href="' + $('#id_schedule_link').val() + '">Go To URL</a>');
+    }
+
+  }
+
   function initNotes() {
     const hash = window.location.hash;
     if (hash && hash === '#notes') {
@@ -48,6 +65,7 @@
       /\/admin\/coversheets\/job\/\d+/.test(path)
     ) {
       initJobNumber();
+      initLinks();
     }
   });
 })();

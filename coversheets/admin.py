@@ -315,6 +315,7 @@ class JobForm(ModelForm):
             'mobile_phone_ext': TextInput(attrs={'style': 'width:60px'}),
             'contact_info_1_ext': TextInput(attrs={'style': 'width:60px'}),
             'contact_info_2_ext': TextInput(attrs={'style': 'width:60px'}),
+            'pending_items': AutosizedTextarea(attrs={'style': 'width:55%'}),
             #DateTimePicker(options={"format": "YYYY-MM-DD", "pickTime": True})
         }
 
@@ -447,11 +448,11 @@ class JobAdmin(RelatedWidgetWrapperBase, VersionAdmin):
                 ('customer', 'customer_email'),
                 ('contact_info_1', 'contact_info_1_ext'),
                 ('contact_info_2', 'contact_info_2_ext'),
+                ('customer_address', 'city', 'zip'),
+                ('same_as_loss_address'),
                 ('contact', 'contact_email'),
                 ('primary_phone', 'primary_phone_ext',),
-                ('mobile_phone', 'mobile_phone_ext'),
-                ('same_as_loss_address'),
-                ('customer_address', 'city', 'zip')),
+                ('mobile_phone', 'mobile_phone_ext'))
         }),
 
         ('Loss Location', {

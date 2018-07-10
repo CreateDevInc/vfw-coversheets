@@ -175,7 +175,7 @@ def weekly_production(request):
     start = now - timedelta(days=365)
     end = now
     show_most_recent_note = False
-    group_by = 'Production Manager'
+    group_by = 'Superintendent'
     sort_by = 'Estimator'
     show_empty = True
     statuses = JobStatus.objects.filter(status__in=['Production'])

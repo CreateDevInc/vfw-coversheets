@@ -9,6 +9,18 @@
       integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8="
       crossorigin="anonymous">
     </script>
+    <script src="https://cdn.datatables.net/1.10.19/js/jquery.dataTables.min.js"></script>
+    <script>
+    $(document).ready( function () {
+      $('.table').each(function () {
+        $(this).DataTable({
+          searching: false,
+          paging: false
+        });
+      })
+    } );
+    </script>
+    <link rel="stylesheet" href="https://cdn.datatables.net/1.10.19/css/jquery.dataTables.min.css" />
     {% load bootstrap3 %}
     {% load humanize %}
     {% bootstrap_css %}
@@ -45,6 +57,7 @@
                       <th class="col-md-1"> Estimator</th>
                       <th class="col-md-1"> Production</th>
                       <th class="col-md-1"> Insurance</th>
+                      <th class="col-md-1"> Adjuster</th>
                       <th class="col-md-1"> Loss Type</th>
                       <th class="col-md-1"> Value</th>
                       <th class="col-md-1"> Program</th>
@@ -71,6 +84,11 @@
                         <td class="col-md-1"></td>
                       {% endif %}
                       <td class="col-md-1"> {{ job.insurance_company }}</td>
+                      {% if job.adjuster %}
+                        <td class="col-md-1"> {{ job.adjuster.first_name }} {{ job.adjuster.last_name }}</td>
+                      {% else %}
+                        <td class="col-md-1"></td>
+                      {% endif %}
                       <td class="col-md-1"> {{ job.loss_type }}</td>
                       <td class="col-md-1"> $ {{ job.estimated_loss | floatformat:2 | intcomma}} </td>
                       <td class="col-md-1"> {{ job.program_type }}</td>

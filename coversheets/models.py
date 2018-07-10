@@ -109,25 +109,27 @@ class Job(models.Model):
     contact_info_1 = PhoneNumberField(blank=True, null=True)
     contact_info_1_ext = models.CharField(max_length=64, blank=True, null=True)
     contact_info_1.verbose_name = 'Best Contact Phone'
-    contact_info_1_ext.verbose_name = 'ext.'
+    contact_info_1_ext.verbose_name = ''
 
     contact_info_2 = PhoneNumberField(blank=True, null=True)
     contact_info_2_ext = models.CharField(max_length=64, blank=True, null=True)
     contact_info_2.verbose_name = 'Addtional Contact Phone'
-    contact_info_2_ext.verbose_name = 'ext.'
+    contact_info_2_ext.verbose_name = ''
 
     contact = models.CharField(max_length=255, null=True, blank=True)
+    contact.verbose_name = 'Contact Person'
+
     contact_email = models.EmailField(blank=True)
 
     primary_phone = PhoneNumberField(blank=True)
     primary_phone_ext = models.CharField(max_length=64, blank=True, null=True)
     primary_phone.verbose_name = 'Best Contact Phone'
-    primary_phone_ext.verbose_name = 'ext.'
+    primary_phone_ext.verbose_name = ''
 
     mobile_phone = PhoneNumberField(blank=True, null=True)
     mobile_phone_ext = models.CharField(max_length=64, blank=True, null=True)
     mobile_phone.verbose_name = 'Additional Contact Phone'
-    mobile_phone_ext.verbose_name = 'ext.'
+    mobile_phone_ext.verbose_name = ''
 
     customer_address = models.CharField(max_length=128, blank=True, null=True)
     customer_address.verbose_name = 'Customer Mailing Address'
