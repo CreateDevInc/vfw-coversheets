@@ -98,5 +98,226 @@
         {% endfor %}
     </div>
 {% endblock %}
+<script>
+(function() {
+    let currentGroupBy = '';
+    let currentSortBy = '';
+
+    // the reset function needs this
+    // map to be able to properly unhide
+    // everything that the filtering hides
+    const elementDisplayTypes = {
+        H3: 'block',
+        H4: 'block',
+        H5: 'block',
+        HR: 'block',
+        TABLE: 'table'
+    }
+
+    const groupByLabel = $('h3')[0].textContent.split(':')[0];
+    const sortByLabel = $('h4')[0].textContent.split(':')[0];
+
+    let groupByOptions = '<option>Select a(n) ' + groupByLabel + '</option>';
+    let sortByOptions = '<option>Select a(n) ' + sortByLabel + '</option>';
+
+    // need to check for sortBy duplicates, whereas groupBy values
+    // will only ever appear once
+    let sortByUsedList = [];
+
+    generateOptions('h3', groupByLabel, function(value) {
+        groupByOptions += '<option>' + value + '</option>';
+    })
+
+    generateOptions('h4', sortByLabel, function(value) {
+        if (!sortByUsedList.includes(value)) {
+            sortByOptions += '<option>' + value + '</option>';
+            sortByUsedList.push(value);
+        }
+    })
+
+    generateSelectBoxes(groupByOptions, sortByOptions);
+
+    $('#group-by').on('change', function(e) {
+        showAllElements();
+
+        let groupByValue = getSelectedOptionValue(e);
+
+        if (groupByValue.includes('Select a(n)')) {
+            groupByValue = '';
+        }
+
+        currentGroupBy = groupByValue;
+
+        filter();
+    });
+
+    $('#sort-by').on('change', function(e) {
+        showAllElements();
+
+        let sortByValue = getSelectedOptionValue(e);
+
+        if (sortByValue.includes('Select a(n)')) {
+            sortByValue = '';
+        }
+
+        currentSortBy = sortByValue;
+
+        filter();
+    });
+
+    function filter(e) {
+        groupBy(currentGroupBy);
+        sortBy(currentSortBy)
+        hideEmptyGroups();
+    }
+
+    function groupBy(sectionNameToShow) {
+        if (sectionNameToShow) {
+            hideGroupBySections(sectionNameToShow);
+        }
+    }
+
+    function sortBy(sectionNameToShow) {
+        if (sectionNameToShow) {
+            hideSortBySections(sectionNameToShow);
+        }
+    }
+
+    function hideGroupBySections(sectionNameToShow) {
+        return hideSections(sectionNameToShow, 'h3', hideGroupBySection);
+    }
+
+    function hideSortBySections(sectionNameToShow) {
+        return hideSections(sectionNameToShow, 'h4', hideSortBySection);
+    }
+
+    // example: groupByElement === <h3>InsuranceCo: Travelers</h3>
+    function hideGroupBySection(groupByElement) {
+        let currentElement = groupByElement;
+
+        while ($(currentElement).prop('tagName') !== "HR") {
+            hideElement(currentElement);
+            currentElement = $(currentElement).next();
+        }
+
+        hideElement(currentElement);
+    }
+
+    // example: sortByElement === <h4>LossType: Vandalism</h4>
+    function hideSortBySection(sortByElement) {
+        if ($(sortByElement).text().includes(sortByLabel)) {
+            hideElement(sortByElement);
+            hideElement($(sortByElement).next())
+            hideElement($(sortByElement).next().next())
+
+            // when we sort by a subgroup, we ONLY need the
+            // subgroup total for that group, because the larger
+            // totals are only for combining the totals of multiple
+            // subgroups. in this case, only ONE subgroup is being shown,
+            // so we ONLY need that subgroup's total
+            let currentElement = sortByElement;
+
+            while ($(currentElement).prop('tagName') !== 'HR') {
+                if (
+                    $(currentElement).prop('tagName') === 'H4' &&
+                    $(currentElement).text().includes('Total:')
+                ) {
+                    hideElement(currentElement)
+                }
+                currentElement = $(currentElement).next();
+            }
+        }
+    }
+
+    function hideSections(sectionNameToShow, sectionSelector, callback) {
+        $.each($(sectionSelector), function() {
+            const shouldBeVisible = $(this).text().includes(sectionNameToShow);
+
+            if (!shouldBeVisible) {
+                callback($(this));
+            }
+        })
+    }
+
+    function hideElement(element) {
+        $(element).css('display', 'none');
+    }
+
+    function showElement(element) {
+        $(element).css('display', elementDisplayTypes[$(element).prop('tagName')]);
+    }
+
+    function showAllElements() {
+        $.each($(':hidden'), function() {
+            const tagName = $(this).prop('tagName');
+
+            if (elementDisplayTypes.hasOwnProperty(tagName)) {
+                showElement(this);
+            }
+        });
+    }
+
+    function generateSelectBoxes(groupByOptions, sortByOptions) {
+        $( $('.container')[0] ).prepend('<div id="front-end-filter" style="padding: 22px 15px 0 0;"></div>');
+
+        $('#front-end-filter').append(
+            '<label>Specific Group by: </label> <select id="group-by">' +
+             groupByOptions +
+              '</option>'
+         );
+        $('#front-end-filter').append(
+            '<label style="margin-left: 20px">Specific Sort by: </label> <select id="sort-by">' +
+            sortByOptions +
+            '</option>'
+        );
+    }
+
+    function generateOptions(selector, label, callback) {
+        $.each( $(selector + ':contains("' + label +'")'), function() {
+            callback($(this).text().split(': ')[1]);
+        });
+    }
+
+    function getSelectedOptionValue(e) {
+        return e.target.options[e.target.selectedIndex].textContent;
+    }
+
+    // it's possible to filter by a subgroup that a group
+    // doesn't have. when that happens, the only thing showing
+    // is the group label (e.g. InsuranceCo: Travelers) and the HR
+    // element beneath it. this function iterates through all of the
+    // groups and hides the ones that are empty
+    function hideEmptyGroups() {
+        $.each( $('h3:contains("' + groupByLabel + '")'), function() {
+           let currentElement = $(this).next();
+           let allElementsHidden = true;
+
+           while ($(currentElement).prop('tagName') !== 'HR') {
+              if ($(currentElement).css('display') !== 'none') {
+                  allElementsHidden = false;
+              }
+              currentElement = $(currentElement).next();
+           }
+
+           if (allElementsHidden) {
+               hideElement(this);
+               hideElement(currentElement);
+           }
+        });
+    }
+
+    const printStyles = `
+    @media print {
+        #front-end-filter {
+            display: none;
+        }
+    }
+    `;
+
+    $('body').prepend('<style>' + printStyles + '</style>');
+
+})();
+
+</script>
 </body>
 </html>
