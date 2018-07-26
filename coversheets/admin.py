@@ -347,7 +347,7 @@ class JobAdmin(RelatedWidgetWrapperBase, VersionAdmin):
     list_display = [
         "customer",
         "loss_address",
-        "city",
+        "loss_city_name",
         "loss_zip",
         "entry_date",
         "job_number_or_empty_string",
@@ -463,7 +463,6 @@ class JobAdmin(RelatedWidgetWrapperBase, VersionAdmin):
                 'loss_zip',
                 'loss_information',
                 'loss_year_built',
-                'additional_info',
                 'map'
             ),
         }),
@@ -505,7 +504,8 @@ class JobAdmin(RelatedWidgetWrapperBase, VersionAdmin):
                 'pending_items',
                 'album_link',
                 'budget_link',
-                'schedule_link'
+                'schedule_link',
+                'additional_info',
             )
         }),
 
@@ -561,6 +561,7 @@ class JobAdmin(RelatedWidgetWrapperBase, VersionAdmin):
             return obj.independent_adjuster.adjuster_type
         else:
             return ''
+    ind_adjuster_type.short_description = 'Adjuster type'
 
     def adjuster_email(self, obj):
         if obj.adjuster is not None:
@@ -589,6 +590,7 @@ class JobAdmin(RelatedWidgetWrapperBase, VersionAdmin):
             return obj.independent_adjuster.full_phone()
         else:
             return ''
+    ind_adjuster_phone.short_description = 'Adjuster phone'
 
     def ind_adjuster_email(self, obj):
         if obj.independent_adjuster is not None:
@@ -599,18 +601,21 @@ class JobAdmin(RelatedWidgetWrapperBase, VersionAdmin):
         else:
             return ''
     ind_adjuster_email.allow_tags = True
+    ind_adjuster_email.short_description = 'Adjuster email'
 
     def ind_adjuster_mobile(self, obj):
         if obj.independent_adjuster is not None:
             return obj.independent_adjuster.full_mobile()
         else:
             return ''
+    ind_adjuster_mobile.short_description = 'Adjuster mobile'
 
     def ind_adjuster_fax(self, obj):
         if obj.independent_adjuster is not None:
             return obj.independent_adjuster.full_fax()
         else:
             return ''
+    ind_adjuster_fax.short_description = 'Adjuster fax'
 
     def value(self, obj):
         if obj.estimated_loss is not None:
@@ -656,6 +661,12 @@ class JobAdmin(RelatedWidgetWrapperBase, VersionAdmin):
             return ""
     job_number_or_empty_string.short_description = "Job Number"
     job_number_or_empty_string.admin_order_field = 'job_number'
+
+    def loss_city_name(self, obj):
+        if obj.loss_city is not None:
+            return obj.loss_city.name
+    loss_city_name.short_description = "City"
+    loss_city_name.admin_order_field = 'loss_city__name'
 
     def save_model(self, request, obj, form, change):
         """

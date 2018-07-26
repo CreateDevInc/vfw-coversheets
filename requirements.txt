@@ -38,7 +38,6 @@ mock==1.0.1
 numpy==1.14.5
 openpyxl==2.2.1
 Pillow==2.7.0
-psycopg2==2.6
 python-dateutil==2.4.2
 pytz==2014.10
 redis==2.10.3

@@ -169,6 +169,13 @@ def sort_jobs_for_template(jobs, group_by_date, sort_by_date):
         })
     return sorted_jobs
 
+def get_total_jobs(jobs):
+    total = 0
+    for group in jobs:
+        for sub_group in jobs[group]:
+            total += len(jobs[group][sub_group])
+    return total
+
 @login_required()
 def weekly_production(request):
     now = datetime.now()
@@ -188,6 +195,7 @@ def weekly_production(request):
 
     return render(request, 'weekly_production.html', {
         'job_groups': sort_jobs_for_template(jobs, False, False),
+        'total_jobs': get_total_jobs(jobs),
         'start': start,
         'end': end,
         'group_by': group_by,

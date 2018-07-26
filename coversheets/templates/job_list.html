@@ -9,10 +9,31 @@
       integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8="
       crossorigin="anonymous">
     </script>
+    <script src="https://cdn.datatables.net/1.10.19/js/jquery.dataTables.min.js"></script>
+    <script>
+    $(document).ready( function () {
+      $('.table').each(function () {
+        $(this).DataTable({
+          searching: false,
+          paging: false
+        });
+      })
+    } );
+    </script>
+    <link rel="stylesheet" href="https://cdn.datatables.net/1.10.19/css/jquery.dataTables.min.css" />
     {% load bootstrap3 %}
     {% load humanize %}
     {% bootstrap_css %}
     {% bootstrap_javascript %}
+    <style>
+      .report-container {
+        width: 1500px;
+      }
+
+      .report-container .table {
+        table-layout: fixed;
+      }
+    </style>
 </head>
 <body>
 {% block content %}
@@ -28,65 +49,65 @@
         www.valleyfireandwater.com<br>
         </span>
     </div>
-    <div class="container">
+    <div class="container report-container">
         <h1>Group By {{ group_by }}, Subgroup By {{ sort_by }}</h1>
         <h2>{{ start }} - {{ end }}</h2>
         {% for group in job_groups %}
           <h3>{{ group_by}}: {{group.name}}</h3>
           {% for subgroup in group.jobs %}
             <h4>{{ sort_by }}: {{subgroup.name}}</h4>
-            <table id="table{{forloop.counter}}" class="table table-striped table-hover table-bordered table-condensed">
+            <table id="table{{forloop.counter}}" class="table table-striped table-hover table-bordered">
               <thead>
                   <tr>
-                      <th class="col-md-2"> Customer </th>
-                      <th class="col-md-1"> Address </th>
-                      <th class="col-md-1"> City </th>
-                      <th class="col-md-1"> Date </th>
-                      <th class="col-md-1"> Program</th>
-                      <th class="col-md-1"> Loss Type</th>
-                      <th class="col-md-1"> Status</th>
-                      <th class="col-md-1"> Insurance</th>
-                      <th class="col-md-1"> Estimator</th>
-                      <th class="col-md-1"> Superintendent</th>
-                      <th class="col-md-1"> Adjuster</th>
-                      <th class="col-md-1"> Production</th>
-                      <th class="col-md-1"> Value</th>
-                      <th class="col-md-1"> Percent Complete</th>
-                      <th class="col-md-1"> Referral Type</th>
-                      <th class="col-md-1"> Pending Items</th>
+                      <th class="col-lg-1"> Customer </th>
+                      <th class="col-lg-1"> Address </th>
+                      <th class="col-lg-1"> City </th>
+                      <th class="col-lg-1"> Date </th>
+                      <th class="col-lg-1"> Program</th>
+                      <th class="col-lg-1"> Loss Type</th>
+                      <th class="col-lg-1"> Status</th>
+                      <th class="col-lg-1"> Insurance</th>
+                      <th class="col-lg-1"> Estimator</th>
+                      <th class="col-lg-1"> Super</th>
+                      <th class="col-lg-1"> Adjuster</th>
+                      <th class="col-lg-1"> Production</th>
+                      <th class="col-lg-1"> Value</th>
+                      <th class="col-lg-1"> Percent Complete</th>
+                      <th class="col-lg-1"> Referral Type</th>
+                      <th class="col-lg-1"> Pending Items</th>
                   </tr>
               </thead>
               <tbody>
                 {% for job in subgroup.jobs %}
                   <tr>
-                      <td class="col-md-2"> {{ job.customer }}</td>
-                      <td class="col-md-1"> {{ job.customer_address }}</td>
-                      <td class="col-md-1"> {{ job.city }}</td>
-                      <td class="col-md-1"> {{ job.entry_date | date:"m/d/y" }}</td>
-                      <td class="col-md-1"> {{ job.program_type }}</td>
-                      <td class="col-md-1"> {{ job.loss_type }}</td>
-                      <td class="col-md-1"> {{ job.status }}</td>
-                      <td class="col-md-1"> {{ job.insurance_company }}</td>
+                      <td> {{ job.customer }}</td>
+                      <td> {{ job.customer_address }}</td>
+                      <td> {{ job.city }}</td>
+                      <td> {{ job.entry_date | date:"m/d/y" }}</td>
+                      <td> {{ job.program_type }}</td>
+                      <td> {{ job.loss_type }}</td>
+                      <td> {{ job.status }}</td>
+                      <td> {{ job.insurance_company }}</td>
                       {% if job.estimator %}
-                        <td class="col-md-1"> {{ job.estimator.first_name }} {{ job.estimator.last_name }}</td>
+                        <td> {{ job.estimator.first_name }} {{ job.estimator.last_name }}</td>
                       {% else %}
-                        <td class="col-md-1"></td>
+                        <td></td>
                       {% endif %}
                       {% if job.super %}
-                        <td class="col-md-1"> {{ job.super.first_name }} {{ job.super.last_name }}</td>
+                        <td> {{ job.super.first_name }} {{ job.super.last_name }}</td>
                       {% else %}
-                        <td class="col-md-1"></td>
+                        <td></td>
                       {% endif %}
-                      <td class="col-md-1"> {{ job.adjuster }} </td>
+                      <td> {{ job.adjuster }} </td>
                       {% if job.production_manager %}
-                        <td class="col-md-1"> {{ job.production_manager.first_name }} {{ job.production_manager.last_name }}</td>
+                        <td> {{ job.production_manager.first_name }} {{ job.production_manager.last_name }}</td>
                       {% else %}
-                        <td class="col-md-1"></td>
+                        <td></td>
                       {% endif %}
-                      <td class="col-md-1"> $ {{ job.estimated_loss | floatformat:2 | intcomma}} </td>
-                      <td class="col-md-1"> {{ job.percent_complete }} </td>
-                      <td class="col-md-1"> {{ job.referral_type }} </td>
-                      <td class="col-md-1"> {{ job.pending_items }} </td>
+                      <td> $ {{ job.estimated_loss | floatformat:2 | intcomma}} </td>
+                      <td> {{ job.percent_complete }} </td>
+                      <td> {{ job.referral_type }} </td>
+                      <td> {{ job.pending_items }} </td>
                   </tr>
                   {% if show_most_recent_note %}
                     <tr>

@@ -26,6 +26,15 @@
     {% load humanize %}
     {% bootstrap_css %}
     {% bootstrap_javascript %}
+    <style>
+      .report-container {
+        width: 1500px;
+      }
+
+      .report-container .table {
+        table-layout: fixed;
+      }
+    </style>
 </head>
 <body>
 {% block content %}
@@ -41,7 +50,7 @@
         www.valleyfireandwater.com<br>
         </span>
     </div>
-    <div class="container">
+    <div class="container report-container">
         <h1>Estimator Snapshot</h1>
         <h2>{{ start }} - {{ end }}</h2>
         {% for group in job_groups %}
@@ -51,7 +60,7 @@
             <table id="table{{forloop.counter}}" class="table table-striped table-hover table-bordered table-condensed">
               <thead>
                   <tr>
-                      <th class="col-md-2"> Customer </th>
+                      <th class="col-md-1"> Customer </th>
                       <th class="col-md-1"> City </th>
                       <th class="col-md-1"> Date </th>
                       <th class="col-md-1"> Insurance </th>
@@ -65,7 +74,7 @@
               <tbody>
                 {% for job in subgroup.jobs %}
                   <tr>
-                      <td class="col-md-2"> {{ job.customer }}</td>
+                      <td class="col-md-1"> {{ job.customer }}</td>
                       <td class="col-md-1"> {{ job.city }}</td>
                       <td class="col-md-1"> {{ job.entry_date | date:"m/d/y" }}</td>
                       <td class="col-md-1"> {{ job.insurance_company }}</td>
