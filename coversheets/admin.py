@@ -372,14 +372,14 @@ class JobAdmin(RelatedWidgetWrapperBase, VersionAdmin):
         'additional_info',
         'customer',
         'customer_address',
-        # 'city',
-        # 'zip',
+        'city__name',
+        'zip',
         'customer_email',
         'contact',
         'contact_email',
         'emergency_dispatch',
         'loss_address',
-        # 'loss_city__name',
+        'loss_city__name',
         'id',
         'info_entered_at',
         'customer',
@@ -406,6 +406,7 @@ class JobAdmin(RelatedWidgetWrapperBase, VersionAdmin):
         'called_in_by',
         'estimated_loss',
         'referred_by',
+        'loss_type__loss_type'
     ]
 
 
@@ -472,11 +473,11 @@ class JobAdmin(RelatedWidgetWrapperBase, VersionAdmin):
             'fields': (
                 ('insurance_company', 'ind_insurance_company'),
                 ('adjuster', 'independent_adjuster'),
+                ('adjuster_type', 'ind_adjuster_type'),
                 ('adjuster_email', 'ind_adjuster_email'),
                 ('adjuster_phone', 'ind_adjuster_phone'),
                 ('adjuster_mobile', 'ind_adjuster_mobile'),
                 ('adjuster_fax', 'ind_adjuster_fax'),
-                ('adjuster_type', 'ind_adjuster_type'),
                 'claim_date',
                 'claim_number',
                 'policy_number',
