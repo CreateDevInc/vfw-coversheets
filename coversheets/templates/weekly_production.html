@@ -64,7 +64,6 @@
                       <th class="col-md-1"> City </th>
                       <th class="col-md-1"> Date </th>
                       <th class="col-md-1"> Estimator</th>
-                      <th class="col-md-1"> Production</th>
                       <th class="col-md-1"> Insurance</th>
                       <th class="col-md-1"> Adjuster</th>
                       <th class="col-md-1"> Loss Type</th>
@@ -84,11 +83,6 @@
                       <td class="col-md-1"> {{ job.entry_date | date:"m/d/y" }}</td>
                       {% if job.estimator %}
                         <td class="col-md-1"> {{ job.estimator.first_name }} {{ job.estimator.last_name }}</td>
-                      {% else %}
-                        <td class="col-md-1"></td>
-                      {% endif %}
-                      {% if job.production_manager %}
-                        <td class="col-md-1"> {{ job.production_manager.first_name }} {{ job.production_manager.last_name }}</td>
                       {% else %}
                         <td class="col-md-1"></td>
                       {% endif %}

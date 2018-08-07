@@ -12,3 +12,13 @@
  .form-horizontal .control-group .field-box .controls .multi-field-box {
      min-width: 250px !important;
  }
+ .object-tools {
+   display: none;
+ }
+ .report-container {
+   width: 1500px;
+ }
+
+ .report-container .table {
+   table-layout: fixed;
+ }

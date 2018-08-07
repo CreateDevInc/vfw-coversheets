@@ -93,9 +93,10 @@ DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql_psycopg2',
         'NAME': 'vfw',
-        'USER': 'vfw',
+        'USER': 'coversheets',
+	'PASSWORD': 'password',
         'HOST': 'localhost',
-        'PORT': '',
+        'PORT': '5433',
     }
 }
 
