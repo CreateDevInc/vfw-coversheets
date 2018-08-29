@@ -48,7 +48,11 @@
     if (hash && hash === '#notes') {
       const rowCount = $('.suit-tab-notes .table tr').length;
       if (rowCount < 3) {
-        $('#id_note_set-0-comment').val('Program:\nInsurance Company:\nType of Loss:\nLoss Description:');
+        $.get('/admin/coversheets/job_info/1823/', function (data) {
+          const { insurance, lossDesc, program, typeOfLoss } = data;
+          $('#id_note_set-0-comment')
+            .val(`Program: ${program}\nInsurance Company: ${insurance}\nType of Loss: ${typeOfLoss}\nLoss Description: ${lossDesc}`);
+        });
       }
     }
   }
@@ -69,6 +73,10 @@
     ) {
       initJobNumber();
       initLinks();
+      console.log('here', $('.field-loss_year_built .datetimeshortcuts'))
+      setTimeout(() => {
+        $('.field-loss_year_built .datetimeshortcuts').hide();
+      }, 200);
     }
   });
 })();

@@ -53,7 +53,7 @@ class AdjusterForm(ModelForm):
 
 @admin.register(coversheets.models.Adjuster)
 class AdjusterAdmin(admin.ModelAdmin):
-    list_display = ['name', 'insurance_company', 'email', 'adjuster_type']
+    list_display = ['name', 'insurance_company', 'email']
     search_fields = ['name', 'insurance_company__name', 'email', 'phone', 'mobile']
     form = AdjusterForm
 
@@ -61,7 +61,6 @@ class AdjusterAdmin(admin.ModelAdmin):
         ('', {
             'fields': (
             ('name',),
-            ('adjuster_type', ),
             ('insurance_company',),
             ('email',),
             ('phone', 'phone_ext'),
@@ -427,12 +426,12 @@ class JobAdmin(RelatedWidgetWrapperBase, VersionAdmin):
         'adjuster_mobile',
         'adjuster_fax',
         'adjuster_email',
-        'adjuster_type',
+        # 'adjuster_type',
         'ind_adjuster_phone',
         'ind_adjuster_mobile',
         'ind_adjuster_fax',
         'ind_adjuster_email',
-        'ind_adjuster_type',
+        # 'ind_adjuster_type',
         'job_number_or_empty_string',
         'map'
     )
@@ -473,7 +472,7 @@ class JobAdmin(RelatedWidgetWrapperBase, VersionAdmin):
             'fields': (
                 ('insurance_company', 'ind_insurance_company'),
                 ('adjuster', 'independent_adjuster'),
-                ('adjuster_type', 'ind_adjuster_type'),
+                ('adjuster_type_1', 'adjuster_type_2'),
                 ('adjuster_email', 'ind_adjuster_email'),
                 ('adjuster_phone', 'ind_adjuster_phone'),
                 ('adjuster_mobile', 'ind_adjuster_mobile'),
@@ -551,18 +550,18 @@ class JobAdmin(RelatedWidgetWrapperBase, VersionAdmin):
         else:
             return ''
 
-    def adjuster_type(self, obj):
-        if obj.adjuster is not None:
-            return obj.adjuster.adjuster_type
-        else:
-            return ''
-
-    def ind_adjuster_type(self, obj):
-        if obj.independent_adjuster is not None:
-            return obj.independent_adjuster.adjuster_type
-        else:
-            return ''
-    ind_adjuster_type.short_description = 'Adjuster type'
+    # def adjuster_type(self, obj):
+    #     if obj.adjuster is not None:
+    #         return obj.adjuster.adjuster_type
+    #     else:
+    #         return ''
+    #
+    # def ind_adjuster_type(self, obj):
+    #     if obj.independent_adjuster is not None:
+    #         return obj.independent_adjuster.adjuster_type
+    #     else:
+    #         return ''
+    # ind_adjuster_type.short_description = 'Adjuster type'
 
     def adjuster_email(self, obj):
         if obj.adjuster is not None:

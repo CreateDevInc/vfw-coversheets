@@ -27,6 +27,8 @@
 of the fields in the right-hand column
 of Adjusters on the Job page */
 .field-insurance_company .controls label,
+.field-adjuster_type_1 .controls label,
+.field-adjuster_type_2 .controls label,
 .field-adjuster .controls label,
 .field-adjuster_email .controls label,
 .field-adjuster_phone .controls label,

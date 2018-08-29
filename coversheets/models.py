@@ -93,6 +93,10 @@ class Job(models.Model):
     album_link = models.CharField(max_length=255, null=True, blank=True)
     budget_link = models.CharField(max_length=512, null=True, blank=True)
     schedule_link = models.CharField(max_length=512, null=True, blank=True)
+    adjuster_type_1 = models.ForeignKey("AdjusterType", related_name='adjuster_type_1', null=True)
+    adjuster_type_2 = models.ForeignKey("AdjusterType", related_name='adjuster_type_2', null=True)
+    adjuster_type_1.verbose_name = 'Adjuster Type'
+    adjuster_type_2.verbose_name = 'Adjuster Type'
 
     #Call info
 
@@ -189,7 +193,6 @@ class Job(models.Model):
 
 class Adjuster(models.Model):
     name = models.CharField(max_length=255)
-    adjuster_type = models.ForeignKey("AdjusterType", null=True)
     phone = PhoneNumberField(blank=True)
     phone_ext = models.CharField(max_length=64, blank=True)
     phone_ext.verbose_name = 'ext.'

@@ -417,3 +417,16 @@ def get_job_number(request):
     # and auto-incremented
     job = Job.objects.exclude(job_number__isnull=True).order_by('-job_number')[0]
     return JsonResponse({'job_number': job.job_number + 1})
+
+@login_required()
+def get_job_info(request, job_id):
+    # Get the last Job with a job number and increment one for new job number
+    # NOTE: This isn't ideal - job_number should *always* be set by the database
+    # and auto-incremented
+    job = Job.objects.get(pk=job_id)
+    return JsonResponse({
+        'program': str(job.program_type),
+        'insurance': str(job.insurance_company),
+        'typeOfLoss': str(job.loss_type),
+        'lossDesc': job.loss_information
+    })
