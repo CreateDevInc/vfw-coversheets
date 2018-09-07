@@ -93,8 +93,8 @@ class Job(models.Model):
     album_link = models.CharField(max_length=255, null=True, blank=True)
     budget_link = models.CharField(max_length=512, null=True, blank=True)
     schedule_link = models.CharField(max_length=512, null=True, blank=True)
-    adjuster_type_1 = models.ForeignKey("AdjusterType", related_name='adjuster_type_1', null=True)
-    adjuster_type_2 = models.ForeignKey("AdjusterType", related_name='adjuster_type_2', null=True)
+    adjuster_type_1 = models.ForeignKey("AdjusterType", blank=True, related_name='adjuster_type_1', null=True)
+    adjuster_type_2 = models.ForeignKey("AdjusterType", blank=True, related_name='adjuster_type_2', null=True)
     adjuster_type_1.verbose_name = 'Adjuster Type'
     adjuster_type_2.verbose_name = 'Adjuster Type'
 
@@ -143,7 +143,7 @@ class Job(models.Model):
     loss_address = models.CharField(max_length=128, blank=True, null=True)
     loss_city = models.ForeignKey(City, related_name="job_city_loss", blank=True, null=True)
     loss_zip = models.CharField(max_length=10, blank=True, null=True)
-    loss_year_built = models.DateField(blank=True, null=True)
+    loss_year_built = models.CharField(max_length=100, null=True, blank=True)
     loss_information = models.TextField(max_length=4000, blank=True, null=True)
 
     # insurance information

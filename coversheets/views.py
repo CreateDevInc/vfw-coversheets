@@ -234,7 +234,7 @@ def estimator_snapshot(request):
 @login_required()
 def warranty_list(request):
     now = datetime.now()
-    start = now - timedelta(days=365)
+    start = now - timedelta(days=365*4)
     end = now
     show_most_recent_note = False
     group_by = 'Production Manager'

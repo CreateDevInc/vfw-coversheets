@@ -78,8 +78,8 @@
                 {% for job in subgroup.jobs %}
                   <tr>
                       <td class="col-md-1"> {{ job.customer }}</td>
-                      <td class="col-md-1"> {{ job.customer_address }}</td>
-                      <td class="col-md-1"> {{ job.city.name }}</td>
+                      <td class="col-md-1"> {{ job.loss_address }}</td>
+                      <td class="col-md-1"> {{ job.loss_city.name }}</td>
                       <td class="col-md-1"> {{ job.entry_date | date:"m/d/y" }}</td>
                       {% if job.estimator %}
                         <td class="col-md-1"> {{ job.estimator.first_name }} {{ job.estimator.last_name }}</td>

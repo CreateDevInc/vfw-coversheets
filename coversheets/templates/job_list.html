@@ -81,8 +81,8 @@
                 {% for job in subgroup.jobs %}
                   <tr>
                       <td> {{ job.customer }}</td>
-                      <td> {{ job.customer_address }}</td>
-                      <td> {{ job.city }}</td>
+                      <td> {{ job.loss_address }}</td>
+                      <td> {{ job.loss_city }}</td>
                       <td> {{ job.entry_date | date:"m/d/y" }}</td>
                       <td> {{ job.program_type }}</td>
                       <td> {{ job.loss_type }}</td>
