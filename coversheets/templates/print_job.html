@@ -97,14 +97,13 @@
                     <h4>{{ job.contact_email }}</h4>
                 </div>
             </div>
-            <div class="row" style="border-bottom: 1px solid #EEE;">
+            <div class="row" style="border-bottom: 1px solid #EEE; padding: 5px;">
                 <div class="col-sm-2" style="font-size: 18px; font-weight: 700;">
                     Loss Address:
                 </div>
                 <div class="col-sm-4" style="font-size: 16px;">
                     {{ job.loss_address }}<br>
                     {{ job.loss_city.name }}, {{ job.loss_city.region.geoname_code }}. {{ job.loss_zip }}<br>
-                    {{ job.loss_information }}
                 </div>
                 <div class="col-sm-2" style="font-size: 18px; font-weight: 700;">
                     Mailing Address:
@@ -113,6 +112,14 @@
                         {{ job.address }}<br>
                         {{ job.city.name }}, {{ job.city.region.geoname_code }}. {{ job.zip }}<br>
                 </div>
+            </div>
+            <div class="row" style="border-bottom: 1px solid #EEE; padding: 3px">
+              <div class="col-sm-2" style="font-size: 18px; font-weight: 700;">
+                  Loss Info:
+              </div>
+              <div class="col-sm-10">
+                    {{ job.loss_information }}
+              </div>
             </div>
             <div class="row" style="border-bottom: 1px solid #EEE;">
                 <h2> Insurance Information </h2>
